@@ -129,7 +129,8 @@
 nativeNX\arc\player\quest\w14_m3.arc 武士道盾斧盾突大解、J防大解、删掉斧下砸的弹刀派生（缺点：1.盾突后按x横斩有延迟，实际上为自由态起手的牵制斩2.盾突后如果是空瓶则无法派生装瓶动作）
 nativeNX\arc\player\quest\w14.arc    动作值\大解命中特效
 nativeNX\arc\shell\pl\w14.arc        超解每次瓶爆的延迟帧
-nativeNX\arc\player\quest\w14_m[01245].arc  删掉斧下砸的弹刀派生
+
+nativeNX\arc\player\quest\w14_m[01245].arc  删掉斧下砸的弹刀派生（配合超模金手指使用）
 ```
 ## 三、超模金手指解释
 ```text
