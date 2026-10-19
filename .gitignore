@@ -1,0 +1,65 @@
+# 编译产物；发布用 NRO / ZIP 放到发布附件，不提交进源码仓库。
+target/
+dist/
+*.nro
+*.nso
+*.nrr
+*.elf
+*.so
+*.dll
+*.exe
+*.pdb
+*.o
+*.obj
+*.a
+*.rlib
+*.rmeta
+*.zip
+*.7z
+*.tar
+*.tar.gz
+
+# 本地验证、旧版本、日志和缓存。
+work/
+legacy-builds/
+node_modules/
+__pycache__/
+*.py[cod]
+*.log
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# 本地安装目录；不会匹配 assets/romfs/ 中的项目素材。
+/romfs/
+/exefs/
+/sdcard/
+/save/
+/saves/
+
+# 编辑器、助手和本机设置。
+/.codex/
+/.codex-tmp/
+/.agents/
+/.vscode/
+/.idea/
+/.vs/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# 保留 Cargo.lock、.cargo/config.toml、默认 INI、文档及所需素材。
+
+# 这些是参考资源，不参与当前 NRO 的正常构建。
+/assets/romfs/nativeNX/arc/**/effect-nouse/
+/assets/romfs/nativeNX/arc/**/sound-nro/
+/assets/romfs/nativeNX/arc/**/player/cmd/
+/assets/romfs/nativeNX/arc/shell-nouse/
+/assets/romfs/nativeNX/arc/weapon-nro/
+
+# 不忽略 hit/pl_we14_hitdata.4E2EF008：Moveset 编译时会嵌入它。
+# tests/data/saed-hdp50.bin 是 56 字节测试基准，也需要保留。

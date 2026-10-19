@@ -1,0 +1,24 @@
+[package]
+name = "presentation-to-4g"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+test = false
+doctest = false
+bench = false
+
+[features]
+# 仅显式启用时编译／安装特效日志钩子，普通构建无逐帧日志。
+debug-logs = []
+
+[dependencies]
+# 在 Forge Plugin UI 内编辑，保存到当前用户存档根目录的 INI，重启后使用。
+mhgu-forge = { git = "https://github.com/Lawrence-al/forge-rs.git", rev = "f2af0622a2a0aa291ffbd3d2f7628c0e2d96d220", features = ["imgui"] }
+cb-game = { path = "../game-api" }
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = "s"

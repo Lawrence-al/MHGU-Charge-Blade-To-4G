@@ -1,0 +1,2089 @@
+{
+  "inputs": [
+    {
+      "file": "D:\\Work\\dump-classicMH\\MHGU dump\\romfs\\nativeNX\\arc\\player\\quest\\w14_m0.arc",
+      "sha256": "4f8c1bc76c09be6f0e043a03ea8959ff34a6f1181e765b3c003d1d8380a1e841",
+      "table": "player\\cmd\\w14\\plcmd_w14_guild",
+      "table_sha256": "591777f53f8d6e8935d6c1bdac8dbf3078a05fe0b7d080eb8364179a029b15d7"
+    },
+    {
+      "file": "D:\\Work\\dump-classicMH\\MHGU dump\\romfs\\nativeNX\\arc\\player\\quest\\w14_m1.arc",
+      "sha256": "f7269952528943633847e519220c638ee0b1e1be09aea63d69389222d0c12022",
+      "table": "player\\cmd\\w14\\plcmd_w14_old",
+      "table_sha256": "16ef34c583ae72deddf6e27fc455ace1dc41e9a17e5b38a8951b50b0609122a2"
+    },
+    {
+      "file": "D:\\Work\\dump-classicMH\\MHGU dump\\romfs\\nativeNX\\arc\\player\\quest\\w14_m2.arc",
+      "sha256": "618a743e8b261ffd498134fe880c4b541e44724a620fa03a126f8699ff352612",
+      "table": "player\\cmd\\w14\\plcmd_w14_airhike",
+      "table_sha256": "d6d962b6b7015a1e97aeed8692663001b3c6ddd37406f769e1944fe0dbd649d5"
+    },
+    {
+      "file": "D:\\Work\\dump-classicMH\\MHGU dump\\romfs\\nativeNX\\arc\\player\\quest\\w14_m3.arc",
+      "sha256": "f7f050816d7c51a6978d03c354793bdc5614e5354836bab575a130574c916a09",
+      "table": "player\\cmd\\w14\\plcmd_w14_bushi",
+      "table_sha256": "822f173374bba2f46e91685595cc13a3e7149f818994e4dc80f0ba9d462fb746"
+    },
+    {
+      "file": "D:\\Work\\dump-classicMH\\MHGU dump\\romfs\\nativeNX\\arc\\player\\quest\\w14_m4.arc",
+      "sha256": "23e4ca76d54ea32989f57faae366c48bb15496de9e5812158f1175a28f331de3",
+      "table": "player\\cmd\\w14\\plcmd_w14_kizuna",
+      "table_sha256": "5a3fce1a5117f531be3136efdb7116ba452be6bd505d104dc4b56168ee4f5b35"
+    },
+    {
+      "file": "D:\\Work\\dump-classicMH\\MHGU dump\\romfs\\nativeNX\\arc\\player\\quest\\w14_m5.arc",
+      "sha256": "6ebf4700ef9d03467703bc23d6a3f59f2eca6ed0b2f6c33faae00c7cb3cf1aba",
+      "table": "player\\cmd\\w14\\plcmd_w14_tatsujin",
+      "table_sha256": "42ad3aa2e646c8c51fd0bb9101f359e5ffd6da050ed6d6a681e89f5a4402ac67"
+    }
+  ],
+  "styles": [
+    {
+      "style": 0,
+      "chains": [
+        {
+          "chain": "0x7F4",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 29394,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_057a",
+              "pre": 0,
+              "start": 0,
+              "end": 28,
+              "fields": {
+                "act_st": 16,
+                "act_no": 57,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x7F5",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 29513,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_086a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 86,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  113
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 29603,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_087a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 87,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  114
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 29693,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_088a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 88,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  115
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 29783,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_058a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 58,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x839",
+          "commands": []
+        },
+        {
+          "chain": "0x83A",
+          "commands": []
+        },
+        {
+          "chain": "0x7DC",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 13488,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_016a",
+              "pre": 0,
+              "start": 4,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 16,
+                "act_param": 16384,
+                "cmd_type": 32768,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  57
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 13578,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x8010_241a",
+              "pre": 30,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 32784,
+                "act_no": 241,
+                "act_param": 0,
+                "cmd_type": 19,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 13668,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_020a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 20,
+                "act_param": 0,
+                "cmd_type": 8,
+                "cmd_params": [
+                  12,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 13758,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_048a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 48,
+                "act_param": 0,
+                "cmd_type": 12,
+                "cmd_params": [
+                  17,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 4,
+              "offset": 13848,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_008a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 8,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  7,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 5,
+              "offset": 13938,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_037a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 37,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 6,
+              "offset": 14028,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_159a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 159,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  49,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 7,
+              "offset": 14118,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_160a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 160,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  50,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 8,
+              "offset": 14208,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_158a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 158,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  24,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "appended_count": 8
+    },
+    {
+      "style": 1,
+      "chains": [
+        {
+          "chain": "0x7F4",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 28404,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_057a",
+              "pre": 0,
+              "start": 0,
+              "end": 28,
+              "fields": {
+                "act_st": 16,
+                "act_no": 57,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x7F5",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 28523,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_086a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 86,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  113
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 28613,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_087a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 87,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  114
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 28703,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_088a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 88,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  115
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 28793,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_058a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 58,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x839",
+          "commands": []
+        },
+        {
+          "chain": "0x83A",
+          "commands": []
+        },
+        {
+          "chain": "0x7DC",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 12948,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_016a",
+              "pre": 0,
+              "start": 4,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 16,
+                "act_param": 16384,
+                "cmd_type": 32768,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  57
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 13038,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x8010_241a",
+              "pre": 30,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 32784,
+                "act_no": 241,
+                "act_param": 0,
+                "cmd_type": 19,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 13128,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_020a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 20,
+                "act_param": 0,
+                "cmd_type": 8,
+                "cmd_params": [
+                  12,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 13218,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_048a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 48,
+                "act_param": 0,
+                "cmd_type": 12,
+                "cmd_params": [
+                  17,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 4,
+              "offset": 13308,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_008a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 8,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  7,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 5,
+              "offset": 13398,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_037a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 37,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 6,
+              "offset": 13488,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_159a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 159,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  49,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 7,
+              "offset": 13578,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_160a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 160,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  50,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 8,
+              "offset": 13668,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_158a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 158,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  24,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "appended_count": 8
+    },
+    {
+      "style": 2,
+      "chains": [
+        {
+          "chain": "0x7F4",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 27144,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_057a",
+              "pre": 0,
+              "start": 0,
+              "end": 28,
+              "fields": {
+                "act_st": 16,
+                "act_no": 57,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x7F5",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 27263,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_086a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 86,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  113
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 27353,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_087a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 87,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  114
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 27443,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_088a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 88,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  115
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 27533,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_058a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 58,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x839",
+          "commands": []
+        },
+        {
+          "chain": "0x83A",
+          "commands": []
+        },
+        {
+          "chain": "0x7DC",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 13128,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_016a",
+              "pre": 0,
+              "start": 4,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 16,
+                "act_param": 16384,
+                "cmd_type": 32768,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  57
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 13218,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x8010_241a",
+              "pre": 30,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 32784,
+                "act_no": 241,
+                "act_param": 0,
+                "cmd_type": 19,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 13308,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_020a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 20,
+                "act_param": 0,
+                "cmd_type": 8,
+                "cmd_params": [
+                  12,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 13398,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_048a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 48,
+                "act_param": 0,
+                "cmd_type": 12,
+                "cmd_params": [
+                  17,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 4,
+              "offset": 13488,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_008a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 8,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  7,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 5,
+              "offset": 13578,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_037a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 37,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 6,
+              "offset": 13668,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_159a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 159,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  49,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 7,
+              "offset": 13758,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_160a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 160,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  50,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 8,
+              "offset": 13848,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_166b",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 166,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  72,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "appended_count": 8
+    },
+    {
+      "style": 3,
+      "chains": [
+        {
+          "chain": "0x7F4",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 29394,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_057a",
+              "pre": 0,
+              "start": 0,
+              "end": 28,
+              "fields": {
+                "act_st": 16,
+                "act_no": 57,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x7F5",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 29513,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_086a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 86,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  113
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 29603,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_087a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 87,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  114
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 29693,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_088a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 88,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  115
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 29783,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_058a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 58,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x839",
+          "commands": []
+        },
+        {
+          "chain": "0x83A",
+          "commands": []
+        },
+        {
+          "chain": "0x7DC",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 13488,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_016a",
+              "pre": 0,
+              "start": 4,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 16,
+                "act_param": 16384,
+                "cmd_type": 32768,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  57
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 13578,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x8010_241a",
+              "pre": 30,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 32784,
+                "act_no": 241,
+                "act_param": 0,
+                "cmd_type": 19,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 13668,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_020a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 20,
+                "act_param": 0,
+                "cmd_type": 8,
+                "cmd_params": [
+                  12,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 13758,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_048a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 48,
+                "act_param": 0,
+                "cmd_type": 12,
+                "cmd_params": [
+                  17,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 4,
+              "offset": 13848,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_008a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 8,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  7,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 5,
+              "offset": 13938,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_037a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 37,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 6,
+              "offset": 14028,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_159a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 159,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  49,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 7,
+              "offset": 14118,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_160a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 160,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  50,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 8,
+              "offset": 14208,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_158a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 158,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  24,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "appended_count": 8
+    },
+    {
+      "style": 4,
+      "chains": [
+        {
+          "chain": "0x7F4",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 28854,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_057a",
+              "pre": 0,
+              "start": 0,
+              "end": 28,
+              "fields": {
+                "act_st": 16,
+                "act_no": 57,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x7F5",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 28973,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_086a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 86,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  113
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 29063,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_087a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 87,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  114
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 29153,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_088a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 88,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  115
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 29243,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_058a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 58,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x839",
+          "commands": []
+        },
+        {
+          "chain": "0x83A",
+          "commands": []
+        },
+        {
+          "chain": "0x7DC",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 13128,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_016a",
+              "pre": 0,
+              "start": 4,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 16,
+                "act_param": 16384,
+                "cmd_type": 32768,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  57
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 13218,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x8010_241a",
+              "pre": 30,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 32784,
+                "act_no": 241,
+                "act_param": 0,
+                "cmd_type": 19,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 13308,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_020a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 20,
+                "act_param": 0,
+                "cmd_type": 8,
+                "cmd_params": [
+                  12,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 13398,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_048a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 48,
+                "act_param": 0,
+                "cmd_type": 12,
+                "cmd_params": [
+                  17,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 4,
+              "offset": 13488,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_008a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 8,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  7,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 5,
+              "offset": 13578,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_037a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 37,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 6,
+              "offset": 13668,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_159a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 159,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  49,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 7,
+              "offset": 13758,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_160a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 160,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  50,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 8,
+              "offset": 13848,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_158a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 158,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  24,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "appended_count": 8
+    },
+    {
+      "style": 5,
+      "chains": [
+        {
+          "chain": "0x7F4",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 36684,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_057a",
+              "pre": 0,
+              "start": 0,
+              "end": 28,
+              "fields": {
+                "act_st": 16,
+                "act_no": 57,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x7F5",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 36803,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_086a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 86,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  113
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 36893,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_087a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 87,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  114
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 36983,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_088a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 88,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  115
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 37073,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_058a",
+              "pre": 16,
+              "start": 16,
+              "end": 33,
+              "fields": {
+                "act_st": 16,
+                "act_no": 58,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "chain": "0x839",
+          "commands": []
+        },
+        {
+          "chain": "0x83A",
+          "commands": []
+        },
+        {
+          "chain": "0x7DC",
+          "commands": [
+            {
+              "index": 0,
+              "offset": 16818,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_016a",
+              "pre": 0,
+              "start": 4,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 16,
+                "act_param": 16384,
+                "cmd_type": 32768,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  57
+                ]
+              }
+            },
+            {
+              "index": 1,
+              "offset": 16908,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x8010_241a",
+              "pre": 30,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 32784,
+                "act_no": 241,
+                "act_param": 0,
+                "cmd_type": 19,
+                "cmd_params": [
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 2,
+              "offset": 16998,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_020a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 20,
+                "act_param": 0,
+                "cmd_type": 8,
+                "cmd_params": [
+                  12,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 3,
+              "offset": 17088,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_048a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 48,
+                "act_param": 0,
+                "cmd_type": 12,
+                "cmd_params": [
+                  17,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 4,
+              "offset": 17178,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_048b",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 48,
+                "act_param": 0,
+                "cmd_type": 8,
+                "cmd_params": [
+                  35,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 5,
+              "offset": 17268,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_008a",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 8,
+                "act_param": 4096,
+                "cmd_type": 8,
+                "cmd_params": [
+                  7,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "index": 6,
+              "offset": 17358,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\w14\\plcmd_w14_0x0010_037b",
+              "pre": 20,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 16,
+                "act_no": 37,
+                "act_param": 4096,
+                "cmd_type": 32776,
+                "cmd_params": [
+                  5,
+                  0,
+                  0,
+                  119
+                ]
+              }
+            },
+            {
+              "index": 7,
+              "offset": 17448,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_285a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 285,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  49,
+                  0,
+                  0,
+                  124
+                ]
+              }
+            },
+            {
+              "index": 8,
+              "offset": 17538,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_284a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 284,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  50,
+                  0,
+                  0,
+                  124
+                ]
+              }
+            },
+            {
+              "index": 9,
+              "offset": 17628,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_283a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 283,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  4,
+                  0,
+                  0,
+                  124
+                ]
+              }
+            },
+            {
+              "index": 10,
+              "offset": 17718,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_159a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 159,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  49,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 11,
+              "offset": 17808,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_160a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 160,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  50,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 12,
+              "offset": 17898,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_158a",
+              "pre": 0,
+              "start": 80,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 158,
+                "act_param": 0,
+                "cmd_type": 32774,
+                "cmd_params": [
+                  24,
+                  0,
+                  0,
+                  1
+                ]
+              }
+            },
+            {
+              "index": 13,
+              "offset": 17988,
+              "dti": "rPlBaseCmd",
+              "path": "player\\cmd\\com\\plcmd_com_0x0001_276a",
+              "pre": 40,
+              "start": 90,
+              "end": 0,
+              "fields": {
+                "act_st": 1,
+                "act_no": 276,
+                "act_param": 0,
+                "cmd_type": 16390,
+                "cmd_params": [
+                  92,
+                  0,
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "appended_count": 13
+    }
+  ],
+  "production_preserved": {
+    "source": "d0c60f6b8f97d67419323627a6895e2bcca11b1f37abdbb22f3f5f826fd18d75",
+    "nro": "bb00ec8b21dfd73dc309119f6aaf3699d4393371b7a7f15c6af8103bb4a230c5"
+  }
+}

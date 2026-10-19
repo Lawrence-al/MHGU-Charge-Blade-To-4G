@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-18",
+  "task": "Preserve native AED/red-shield commands and append current-style axe recovery commands",
+  "nro": {
+    "bytes": 77824,
+    "sha256": "afa2e7be2bb25305a3da867def7a3366526139b890de6d55599d0cbf1c276627"
+  },
+  "hook": {
+    "offset": "0x002E9B7C",
+    "original_entry_words": [
+      "0xE92D48F0",
+      "0xE1A05002"
+    ],
+    "original_called_first": true,
+    "original_r0_retained": true
+  },
+  "table": {
+    "size": 28,
+    "count_offset": 8,
+    "records_offset": 20,
+    "capacity": 48,
+    "native_aed_chains": [
+      "0x7F4",
+      "0x7F5",
+      "0x839",
+      "0x83A"
+    ],
+    "appended_chain": "0x7DC",
+    "appended_start": 1,
+    "red_shield_window": {
+      "pre": 0,
+      "start": 0,
+      "end": 28
+    }
+  },
+  "verification": {
+    "full_test_sh_passed": true,
+    "real_resource_merge_reload_cases": 72,
+    "compiled_arm_callback_cases": 336,
+    "hook_selection_combinations": 512,
+    "source_arcs_unchanged": 6,
+    "game_tested": false
+  },
+  "installed_changes": [
+    {
+      "file": "romfs/nativeNX/plugins/cb_moveset_to_4g.nro",
+      "before": "bb00ec8b21dfd73dc309119f6aaf3699d4393371b7a7f15c6af8103bb4a230c5",
+      "after": "afa2e7be2bb25305a3da867def7a3366526139b890de6d55599d0cbf1c276627"
+    }
+  ],
+  "other_installed_files_unchanged": 9,
+  "config_files_written": 0,
+  "files": [
+    {
+      "file": "Moveset-to-4G/src/overpowered.rs",
+      "sha256": "d5eb99046e4f96e5e59c4e243d75b5b67e448c392ac31a0fda3cc502aa282562"
+    },
+    {
+      "file": "Moveset-to-4G/src/hooks.rs",
+      "sha256": "5e87f440fa36cd502a17b1ef791385454ba6fb4203ec2d54acbc1041150fdd96"
+    },
+    {
+      "file": "Moveset-to-4G/src/patches.rs",
+      "sha256": "be987ed757cfdde32dcdbff19bcb6659e0096665c245023db25d62efd535110a"
+    },
+    {
+      "file": "game-api/src/command.rs",
+      "sha256": "b7b03612ffeca0d3591e75e8a5fe782a53849bc46ba611a8f46606941438c9a3"
+    },
+    {
+      "file": "game-api/src/player.rs",
+      "sha256": "81a475215ec5f78d7065f66add9229a3610c3412be3151787185f23ee9fd2cb4"
+    },
+    {
+      "file": "game-api/src/lib.rs",
+      "sha256": "39e89247c54aecedea5980739363623043ffb01fcf8a4cb72ababe3fd6a09e14"
+    },
+    {
+      "file": "cb_moveset_to_4g.ini",
+      "sha256": "d5112baf962b7a9fabe9106a00a11a10660ae2b9307f62e928c8f5532ebf58b3"
+    },
+    {
+      "file": "test.sh",
+      "sha256": "70b37b7942ae69989c6664e246521b803c14641b0183c1027159ca292887471d"
+    },
+    {
+      "file": "tests/command-resources.js",
+      "sha256": "5cb82a83b3cf341a82c2d3426a198df7f8a77d91af394999d447c7a8cbfe99ab"
+    },
+    {
+      "file": "tests/verify-overpowered.js",
+      "sha256": "9e7a7265ef0b4dcd7ebac83f01bb437b7e54688a9a104fa7da1106782566071c"
+    },
+    {
+      "file": "tests/verify-overpowered-merge.js",
+      "sha256": "f9946b9e2c02ce6e4d3b65ad1cb5a1531b255b60bcd51fc77894a04f904c046e"
+    },
+    {
+      "file": "tests/verify-phial-origin.rs",
+      "sha256": "3da0a5a0ad3a8e00fb0a00b606d78eef11a16d665a5cc3916f145640e55aa3b2"
+    },
+    {
+      "file": "tests/verify-install.js",
+      "sha256": "5fe93681d3a289086a533ebdfc73f50bc068e1c88b6d65cce66c71662c141c51"
+    },
+    {
+      "file": "tests/verify.js",
+      "sha256": "5d33be44aa8dd3eb2bd6ebfec8aba59e8de51f5895c47839e00052452bf23e13"
+    },
+    {
+      "file": "tests/fixtures.js",
+      "sha256": "66365f4d4975e14cf457a71886e6df51cde8abc23064523b00de7943c37aeea1"
+    },
+    {
+      "file": "tests/game-host.js",
+      "sha256": "4724c25cf16d73ff42fa18a462f8d1bcdf47356cf0337fe6996d74ae939bc502"
+    },
+    {
+      "file": "docs/Overpowered.md",
+      "sha256": "e22477c1fad1586f0b6642ba02f1ca4375e8c639f8404080bc83f528ce44a53b"
+    },
+    {
+      "file": "docs/2026-10-18_逆向-超模保留红盾派生-report.md",
+      "sha256": "685c110d296d699b08c3b6c2d293f9bfaa4ae459d884777f4185ee0219ef6dcc"
+    },
+    {
+      "file": "work\\20261018-overpowered-red-shield\\tests.log",
+      "sha256": "418b6bcb47a94cdfbdb1af97356d326289cd634fc829e1d5475666de00248563"
+    },
+    {
+      "file": "work\\20261018-overpowered-red-shield\\build.log",
+      "sha256": "996abda2f060275d07a8947549f6e67a102ca09a2e15e43bc95f3914db2aeeca"
+    }
+  ]
+}
