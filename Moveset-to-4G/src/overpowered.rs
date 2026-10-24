@@ -1,4 +1,5 @@
-//! 超模后摇：保留原大解链，在当前玩家的表副本后追加本风格的斧竖劈派生。
+//! 大解/防御后追加派生：保留原表，在当前玩家的固定地址副本后追加记录。
+use crate::style::{self, Feature};
 use alloc::{boxed::Box, vec::Vec};
 use cb_game::{
     command::{CommandTable, TableHeader},
@@ -55,6 +56,26 @@ impl ActorTable {
         self.header.records = self.records.as_ptr() as u32;
         Ok(true)
     }
+
+    /// 借用本风格第1条原命令的Active与窗口；末条临时命令再由桥接改为X+A→0x4B。
+    /// 不修改借用的资源对象，也不删除原来任何派生。
+    unsafe fn rebuild_guard(&mut self, original: CommandTable) -> Result<bool, (u32, u32)> {
+        let count = unsafe { original.count() };
+        if count < 2 {
+            return Ok(false);
+        }
+        if count >= MAX_COMMANDS as u32 {
+            return Err((count, 1));
+        }
+        for index in 0..count as usize {
+            self.records[index] = unsafe { original.record(index) };
+        }
+        self.records[count as usize] = unsafe { original.record(1) };
+        self.header = unsafe { original.header() };
+        self.header.count = count + 1;
+        self.header.records = self.records.as_ptr() as u32;
+        Ok(true)
+    }
 }
 
 struct Tables {
@@ -84,10 +105,12 @@ pub fn init() {
 /// 不缓存资源内容，不对原表或命令对象增删字段，也不向游戏交出副本所有权。
 #[inline(never)]
 pub unsafe fn after_chain_init(player: ChargeBladePlayer, requested_chain: u32) {
-    if !matches!(requested_chain, 0x7F4 | 0x7F5 | 0x839 | 0x83A) {
-        return;
-    }
-    if unsafe { player.equipment().weapon_type() } != 14 {
+    let feature = match requested_chain {
+        0x7F4 | 0x7F5 | 0x839 | 0x83A => Feature::AedFollowups,
+        0x802 | 0x803 => Feature::GuardRecoilYellow,
+        _ => return,
+    };
+    if !unsafe { style::enabled_for(player, feature) } {
         return;
     }
     // 原初始化有拒绝切换的分支；不替错误动作挂表。
@@ -108,12 +131,17 @@ pub unsafe fn after_chain_init(player: ChargeBladePlayer, requested_chain: u32) 
         if original == actor.table() {
             return;
         }
-        let axe = unsafe { player.command_resource().weapon_table(AXE_CHAIN) };
-        match unsafe { actor.rebuild(original, axe) } {
+        let result = if matches!(requested_chain, 0x802 | 0x803) {
+            unsafe { actor.rebuild_guard(original) }
+        } else {
+            let axe = unsafe { player.command_resource().weapon_table(AXE_CHAIN) };
+            unsafe { actor.rebuild(original, axe) }
+        };
+        match result {
             Ok(true) => unsafe { player.set_command_table(actor.table()) },
             Ok(false) => {}
             Err((original, appended)) => forge::log::prelude::error!(
-                "moveset-to-4g: AED commands {original}+{appended} exceed {MAX_COMMANDS}; original table retained"
+                "moveset-to-4g: commands {original}+{appended} exceed {MAX_COMMANDS}; original table retained"
             ),
         }
     });

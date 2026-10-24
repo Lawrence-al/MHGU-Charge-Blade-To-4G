@@ -1,0 +1,1821 @@
+{
+  "schema": 1,
+  "scope": "All 29 MH4G charge blade gaxe EFLs; individually selectable preview",
+  "namespace": "effect\\cb4gp\\",
+  "pel": {
+    "path": "effect\\cb4gp\\gaxe_preview",
+    "lists": [
+      0,
+      0,
+      29
+    ]
+  },
+  "effects": [
+    {
+      "id": 1,
+      "name": "gaxe_001",
+      "path": "effect\\cb4gp\\gaxe_001",
+      "units": 8,
+      "unit_types": {
+        "1": 4,
+        "5": 4
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 2,
+      "name": "gaxe_002",
+      "path": "effect\\cb4gp\\gaxe_002",
+      "units": 8,
+      "unit_types": {
+        "5": 4,
+        "0": 4
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 3,
+      "name": "gaxe_003",
+      "path": "effect\\cb4gp\\gaxe_003",
+      "units": 5,
+      "unit_types": {
+        "0": 4,
+        "5": 1
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 4,
+      "name": "gaxe_004",
+      "path": "effect\\cb4gp\\gaxe_004",
+      "units": 3,
+      "unit_types": {
+        "0": 2,
+        "5": 1
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 5,
+      "name": "gaxe_005",
+      "path": "effect\\cb4gp\\gaxe_005",
+      "units": 16,
+      "unit_types": {
+        "5": 8,
+        "0": 6,
+        "1": 2
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 6,
+      "name": "gaxe_006",
+      "path": "effect\\cb4gp\\gaxe_006",
+      "units": 6,
+      "unit_types": {
+        "5": 2,
+        "0": 4
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 7,
+      "name": "gaxe_007",
+      "path": "effect\\cb4gp\\gaxe_007",
+      "units": 14,
+      "unit_types": {
+        "5": 3,
+        "0": 4,
+        "2": 3,
+        "1": 4
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 8,
+      "name": "gaxe_008",
+      "path": "effect\\cb4gp\\gaxe_008",
+      "units": 23,
+      "unit_types": {
+        "5": 10,
+        "0": 11,
+        "1": 2
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 9,
+      "name": "gaxe_009",
+      "path": "effect\\cb4gp\\gaxe_009",
+      "units": 23,
+      "unit_types": {
+        "5": 10,
+        "0": 11,
+        "1": 2
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 10,
+      "name": "gaxe_010",
+      "path": "effect\\cb4gp\\gaxe_010",
+      "units": 6,
+      "unit_types": {
+        "5": 5,
+        "1": 1
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 11,
+      "name": "gaxe_011",
+      "path": "effect\\cb4gp\\gaxe_011",
+      "units": 5,
+      "unit_types": {
+        "0": 5
+      },
+      "source_colour_block": [
+        16,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 12,
+      "name": "gaxe_012",
+      "path": "effect\\cb4gp\\gaxe_012",
+      "units": 7,
+      "unit_types": {
+        "1": 2,
+        "5": 1,
+        "0": 3,
+        "2": 1
+      },
+      "source_colour_block": [
+        16,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 13,
+      "name": "gaxe_013",
+      "path": "effect\\cb4gp\\gaxe_013",
+      "units": 9,
+      "unit_types": {
+        "0": 5,
+        "1": 2,
+        "5": 1,
+        "2": 1
+      },
+      "source_colour_block": [
+        16,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 14,
+      "name": "gaxe_014",
+      "path": "effect\\cb4gp\\gaxe_014",
+      "units": 2,
+      "unit_types": {
+        "5": 2
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 15,
+      "name": "gaxe_015",
+      "path": "effect\\cb4gp\\gaxe_015",
+      "units": 3,
+      "unit_types": {
+        "5": 2,
+        "0": 1
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 16,
+      "name": "gaxe_016",
+      "path": "effect\\cb4gp\\gaxe_016",
+      "units": 3,
+      "unit_types": {
+        "5": 2,
+        "0": 1
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 17,
+      "name": "gaxe_017",
+      "path": "effect\\cb4gp\\gaxe_017",
+      "units": 6,
+      "unit_types": {
+        "0": 5,
+        "2": 1
+      },
+      "source_colour_block": [
+        16,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 18,
+      "name": "gaxe_018",
+      "path": "effect\\cb4gp\\gaxe_018",
+      "units": 6,
+      "unit_types": {
+        "0": 2,
+        "1": 4
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 50,
+      "name": "gaxe_050",
+      "path": "effect\\cb4gp\\gaxe_050",
+      "units": 1,
+      "unit_types": {
+        "15": 1
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 51,
+      "name": "gaxe_051",
+      "path": "effect\\cb4gp\\gaxe_051",
+      "units": 1,
+      "unit_types": {
+        "15": 1
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 100,
+      "name": "gaxe_100",
+      "path": "effect\\cb4gp\\gaxe_100",
+      "units": 14,
+      "unit_types": {
+        "5": 10,
+        "0": 4
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 101,
+      "name": "gaxe_101",
+      "path": "effect\\cb4gp\\gaxe_101",
+      "units": 2,
+      "unit_types": {
+        "0": 2
+      },
+      "source_colour_block": [
+        16,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 102,
+      "name": "gaxe_102",
+      "path": "effect\\cb4gp\\gaxe_102",
+      "units": 3,
+      "unit_types": {
+        "0": 1,
+        "5": 2
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 103,
+      "name": "gaxe_103",
+      "path": "effect\\cb4gp\\gaxe_103",
+      "units": 28,
+      "unit_types": {
+        "5": 14,
+        "0": 10,
+        "1": 4
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 104,
+      "name": "gaxe_104",
+      "path": "effect\\cb4gp\\gaxe_104",
+      "units": 17,
+      "unit_types": {
+        "5": 3,
+        "1": 4,
+        "0": 8,
+        "2": 2
+      },
+      "source_colour_block": [
+        16,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "id": 105,
+      "name": "gaxe_105",
+      "path": "effect\\cb4gp\\gaxe_105",
+      "units": 16,
+      "unit_types": {
+        "5": 12,
+        "1": 2,
+        "0": 2
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 106,
+      "name": "gaxe_106",
+      "path": "effect\\cb4gp\\gaxe_106",
+      "units": 26,
+      "unit_types": {
+        "5": 16,
+        "0": 6,
+        "1": 4
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 107,
+      "name": "gaxe_107",
+      "path": "effect\\cb4gp\\gaxe_107",
+      "units": 49,
+      "unit_types": {
+        "5": 24,
+        "1": 10,
+        "0": 15
+      },
+      "source_colour_block": null
+    },
+    {
+      "id": 108,
+      "name": "gaxe_108",
+      "path": "effect\\cb4gp\\gaxe_108",
+      "units": 8,
+      "unit_types": {
+        "5": 8
+      },
+      "source_colour_block": null
+    }
+  ],
+  "entries": [
+    {
+      "archive_path": "effect\\cb4gp\\cm000_GSM_HQ_NOMIP",
+      "type_hash": "0x241F5DEB",
+      "file": "effect/cb4gp/cm000_GSM_HQ_NOMIP.241f5deb",
+      "bytes": 524312,
+      "sha256": "0bccfa86f07c175635a8cf214f3366f864df7ea566f5ef752a37a9487bdd72b4"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\qe000_BM_NOMIP",
+      "type_hash": "0x241F5DEB",
+      "file": "effect/cb4gp/qe000_BM_NOMIP.241f5deb",
+      "bytes": 131096,
+      "sha256": "7896395bbf0dcbc3bbf90a37e4541cb4ebcfb967cd48e3582e77d31e4d620396"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\qe001_001_BM_NOMIP",
+      "type_hash": "0x241F5DEB",
+      "file": "effect/cb4gp/qe001_001_BM_NOMIP.241f5deb",
+      "bytes": 32792,
+      "sha256": "fedda70d05d0601d45c8826d60dc2b5bc85b3420bfdcfd6015ed77298e239442"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\qe001_BM_NOMIP",
+      "type_hash": "0x241F5DEB",
+      "file": "effect/cb4gp/qe001_BM_NOMIP.241f5deb",
+      "bytes": 1048600,
+      "sha256": "79729e87a7b0707de513445b140b041d4b62e340a6141b7f6b4e265cac59bc90"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_000_BM",
+      "type_hash": "0x241F5DEB",
+      "file": "effect/cb4gp/gaxe_000_BM.241f5deb",
+      "bytes": 4120,
+      "sha256": "e150895b1a29924df983a99b118a4ebf0dd02e357e1db500cf8c484d89a551b4"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\cm000",
+      "type_hash": "0x4E397417",
+      "file": "effect/cb4gp/cm000.4e397417",
+      "bytes": 2352,
+      "sha256": "e98879e18db02a0ef4383f06a7b97238b3248bc61c3c543720552bddfe4079b8"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\qe001",
+      "type_hash": "0x4E397417",
+      "file": "effect/cb4gp/qe001.4e397417",
+      "bytes": 4544,
+      "sha256": "8dc6b59c253e30ae46b6dec0acbf7489a54d18ebba6d7762650010945a95d160"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\cm000_000",
+      "type_hash": "0x2749C8A8",
+      "file": "effect/cb4gp/cm000_000.2749c8a8",
+      "bytes": 948,
+      "sha256": "8a29c1dfd7cd8640cc660c8f5c5c8bf8d240597e9329a1c5141c08205a36936e"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\qe000_001",
+      "type_hash": "0x2749C8A8",
+      "file": "effect/cb4gp/qe000_001.2749c8a8",
+      "bytes": 948,
+      "sha256": "fab26c0d3db0aad8ceceba1e6395ec9b966c01f76737013ea105f3db7e9432cb"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\qe001_000",
+      "type_hash": "0x2749C8A8",
+      "file": "effect/cb4gp/qe001_000.2749c8a8",
+      "bytes": 1868,
+      "sha256": "e178a02b04f5906fc31b3df7c8c08c0c1bd722182c609b68064fab1751f12f18"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe",
+      "type_hash": "0x2749C8A8",
+      "file": "effect/cb4gp/gaxe.2749c8a8",
+      "bytes": 948,
+      "sha256": "056725b8c685733d9372cf9c6a6c253581d2a7f06e1e3ddbfa7374ad21812c24"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\cm000_000",
+      "type_hash": "0x58A15856",
+      "file": "effect/cb4gp/cm000_000.58a15856",
+      "bytes": 30402,
+      "sha256": "b76829b8f960166a5c9337277fa506ecbcd25b3171f227a30426e83f6a0412e5"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\qe000_001",
+      "type_hash": "0x58A15856",
+      "file": "effect/cb4gp/qe000_001.58a15856",
+      "bytes": 32080,
+      "sha256": "17c30a25377af8b779415bb154484f952734b287ee80fa5d78dbdeaa60bedacc"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\qe001_000",
+      "type_hash": "0x58A15856",
+      "file": "effect/cb4gp/qe001_000.58a15856",
+      "bytes": 135812,
+      "sha256": "2acd5054ecc8ff088ceef4be92381cc2073c29bb367962ef8027187fa4bd581e"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe",
+      "type_hash": "0x58A15856",
+      "file": "effect/cb4gp/gaxe.58a15856",
+      "bytes": 10618,
+      "sha256": "6935f08f0f857f7ca6a105009d3353b7d6c404e00284096d35eefb12278abe37"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_001",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_001.6d5ae854",
+      "bytes": 5040,
+      "sha256": "53fecd48fe9174efb3b2fbfe83e9066540956144c12e0cef10a782b171cee454"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_002",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_002.6d5ae854",
+      "bytes": 5328,
+      "sha256": "80d2d124569bddaca4cf87e2571d6a584765049476c114dbb3929a1d8df9a94c"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_003",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_003.6d5ae854",
+      "bytes": 3904,
+      "sha256": "4ab48baa49eae9d118ff5342c7b3f238213b6075300a81daab9f577a2ceb7908"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_004",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_004.6d5ae854",
+      "bytes": 2272,
+      "sha256": "2e13ef4e73c74545832e55131efbff51c5f63f98b5050ac1dcfe97919d49578a"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_005",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_005.6d5ae854",
+      "bytes": 10288,
+      "sha256": "6620560ec6170dc6eeca1f6f2a3c00d9221197dd50d4aaf82d8fb47936f19527"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_006",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_006.6d5ae854",
+      "bytes": 4384,
+      "sha256": "72bd781253186a9f9a25011cdab389f41e019a04126c2df5d6ceb9476d7a9346"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_007",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_007.6d5ae854",
+      "bytes": 10800,
+      "sha256": "7219804b6a7094e4b376fb94bf18edf913fd9dacca0ffc6178e136227e4b9e10"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_008",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_008.6d5ae854",
+      "bytes": 18128,
+      "sha256": "944aa0484d625b229e533373b6f4fd832cb55249bedb0424a5d707b7caaaf78b"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_009",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_009.6d5ae854",
+      "bytes": 17824,
+      "sha256": "b3315703fad59b2ce43eb4d63d25e0a6b622723a394403583bf28a69dd95cd58"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_010",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_010.6d5ae854",
+      "bytes": 4592,
+      "sha256": "8366fa277e4cc4d9a7006381732acb1aea3c3a651bf45d867f60876f2b80d408"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_011",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_011.6d5ae854",
+      "bytes": 4176,
+      "sha256": "cb72b4128a2f5d22154250d360a595a67afc62d76b88b93f278aaf914be8a421"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_012",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_012.6d5ae854",
+      "bytes": 5872,
+      "sha256": "d2f9f9c81a6ae2137264ac96a3b1419c621b0a601f326c04119615e715172913"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_013",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_013.6d5ae854",
+      "bytes": 6592,
+      "sha256": "e927bd6cea3728e796a3915730bcf84d1725b1c5640360eeef02f32e9a0dfcc2"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_014",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_014.6d5ae854",
+      "bytes": 1632,
+      "sha256": "0d65e695d7cd9d09067ac9231dd9ced6959006fe18b5be9a746bfd07329fa09d"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_015",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_015.6d5ae854",
+      "bytes": 2032,
+      "sha256": "02f8b893aee563112c8f60a71555778fbd711d42bbc379ab8fc29f9cd7b10ee1"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_016",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_016.6d5ae854",
+      "bytes": 2288,
+      "sha256": "fc5f11b8ee015d741cd7f86b756a024f4189f22ef68115cc038c7379491a9089"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_017",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_017.6d5ae854",
+      "bytes": 5056,
+      "sha256": "d1543af32570b3de0ee92df1f89b7323c4a2f89d820c639ae0121e8e8da82ead"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_018",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_018.6d5ae854",
+      "bytes": 2896,
+      "sha256": "9950536596ab400f8822c9709baa6ec21e726a340088851e57587c814d84dd4b"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_050",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_050.6d5ae854",
+      "bytes": 880,
+      "sha256": "d3fdff4cc81bba9db39162f24526981cbfd31efea53aae58154af70ccf316749"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_051",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_051.6d5ae854",
+      "bytes": 880,
+      "sha256": "95d973858a6e38393fc04ddf850c0daa2fb3c2b4c60b245d0cecbbeb0d70253d"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_100",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_100.6d5ae854",
+      "bytes": 8368,
+      "sha256": "f63b17b547ebea4a8934ff1cb2bf6a29d1c66aea59c5a80b8188ff7028c114f5"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_101",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_101.6d5ae854",
+      "bytes": 1632,
+      "sha256": "0d9e7ec60c28bc682eea3f8e176ffd26e9db4800a109cd179874f2215a7b246b"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_102",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_102.6d5ae854",
+      "bytes": 2432,
+      "sha256": "31bff0638846e6210dbb1ab78271230f0f1c5b192e6074bec77ae7c6c03a6089"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_103",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_103.6d5ae854",
+      "bytes": 19776,
+      "sha256": "6e651769079dec7c9a3152efc7df964c7e2f824add19d907725260f84b00aca0"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_104",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_104.6d5ae854",
+      "bytes": 13776,
+      "sha256": "9357808d3658a83354d408b8bc97523d6ebd76bffad664f85127364dd6ac44c6"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_105",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_105.6d5ae854",
+      "bytes": 10336,
+      "sha256": "ecf4bd3ed062184600f9835679c58370962b0a05d32cfd20f0adb3cc78b83054"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_106",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_106.6d5ae854",
+      "bytes": 13248,
+      "sha256": "34aca45c19ff4eed13bba96d02b76e4d3cd4656baba0e9a059f80750d3655c3c"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_107",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_107.6d5ae854",
+      "bytes": 36336,
+      "sha256": "038c45fe1df8d9e19ddfb070bd49f44ea1a756c04936ece35859567939ff9987"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_108",
+      "type_hash": "0x6D5AE854",
+      "file": "effect/cb4gp/gaxe_108.6d5ae854",
+      "bytes": 5024,
+      "sha256": "694833e4e72422fb0be1f6b6f1ad4cce5dd83aa71f92d57c9d8e8373ddadca37"
+    },
+    {
+      "archive_path": "effect\\cb4gp\\gaxe_preview",
+      "type_hash": "0x5A525C16",
+      "file": "effect/cb4gp/gaxe_preview.5a525c16",
+      "bytes": 5356,
+      "sha256": "c13a2db162578e940240556a166dcafc5396c313399ee6230458d29c8966c444"
+    }
+  ],
+  "validation": [
+    {
+      "path": "effect\\cb4gp\\cm000",
+      "check": "GU version; animation payload unchanged",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\cm000_000",
+      "check": "GU MOD, boneless effect vertex format",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\cm000_000",
+      "check": "GU MRL and texture closure",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\cm000_GSM_HQ_NOMIP",
+      "check": "decoded RGBA exact equality",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\qe000_001",
+      "check": "GU MOD, boneless effect vertex format",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\qe000_001",
+      "check": "GU MRL and texture closure",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\qe000_BM_NOMIP",
+      "check": "decoded RGBA exact equality",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\qe001",
+      "check": "GU version; animation payload unchanged",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\qe001_000",
+      "check": "GU MOD, boneless effect vertex format",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\qe001_000",
+      "check": "GU MRL and texture closure",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\qe001_001_BM_NOMIP",
+      "check": "decoded RGBA exact equality",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\qe001_BM_NOMIP",
+      "check": "decoded RGBA exact equality",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe",
+      "check": "GU MOD, boneless effect vertex format",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe",
+      "check": "GU MRL and texture closure",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_000_BM",
+      "check": "decoded RGBA exact equality",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_001",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_002",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_003",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_004",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_005",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_006",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_007",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_008",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_009",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_010",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_011",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_012",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_013",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_014",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_015",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_016",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_017",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_018",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_050",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_051",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_100",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_101",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_102",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_103",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_104",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_105",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_106",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_107",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    },
+    {
+      "path": "effect\\cb4gp\\gaxe_108",
+      "check": "EFL structure, namespaced dependencies, original colour block",
+      "passed": true
+    }
+  ],
+  "conversion_notes": [],
+  "source_dependencies": [
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_001",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_001",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_001",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\wp\\gaxe\\gaxe"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_002",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_002",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_002",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_003",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_003",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_003",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_003",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_003",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_004",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_004",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_004",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\wp\\gaxe\\gaxe"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_005",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_005",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_005",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_005",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_005",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\wp\\gaxe\\gaxe"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_006",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_006",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_006",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_006",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_006",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_006",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_007",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_007",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_007",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_007",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_007",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_008",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_008",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_008",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_008",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_008",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_008",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_009",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_009",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_009",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_009",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_009",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_009",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_010",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_010",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_010",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_010",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_010",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\wp\\gaxe\\gaxe"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_011",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_011",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_011",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_011",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_012",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_012",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_012",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_012",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_012",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_013",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_013",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_013",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_013",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_013",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_014",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_015",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_015",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_015",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_015",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\wp\\gaxe\\gaxe"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_016",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_016",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_016",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_017",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_017",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_017",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_017",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_018",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_018",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_018",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_018",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_050",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_050",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_051",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_051",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_100",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_100",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_100",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_100",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_101",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_101",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_102",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_102",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_102",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_102",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\wp\\gaxe\\gaxe"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_103",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_103",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_103",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_103",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_103",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_103",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_103",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\wp\\gaxe\\gaxe"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_104",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_104",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_104",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_104",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe000\\qe000_001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_105",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_105",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_105",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_105",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_105",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_106",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_106",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_106",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_106",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_106",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\wp\\gaxe\\gaxe"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_107",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_107",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_107",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_107",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe000\\qe000_001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_107",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_107",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_107",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_108",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_000"
+    },
+    {
+      "source": "effect\\efl\\wp\\gaxe\\gaxe_108",
+      "source_kind": "EFL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_000"
+    },
+    {
+      "source": "effect\\base\\wp\\gaxe\\gaxe",
+      "source_kind": "MRL",
+      "dependency": "effect\\base\\wp\\gaxe\\gaxe_000_BM"
+    },
+    {
+      "source": "effect\\base\\cm\\cm000\\cm000_000",
+      "source_kind": "MRL",
+      "dependency": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP"
+    },
+    {
+      "source": "effect\\base\\qe\\qe001\\qe001_000",
+      "source_kind": "MRL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\base\\qe\\qe001\\qe001_000",
+      "source_kind": "MRL",
+      "dependency": "effect\\base\\qe\\qe001\\qe001_001_BM_NOMIP"
+    },
+    {
+      "source": "effect\\base\\qe\\qe000\\qe000_001",
+      "source_kind": "MRL",
+      "dependency": "effect\\base\\qe\\qe000\\qe000_BM_NOMIP"
+    }
+  ],
+  "sources": [
+    {
+      "path": "effect\\base\\cm\\cm000\\cm000",
+      "kind": "EAN",
+      "bytes": 2352,
+      "sha256": "1989d59ef310622ddaace88aa5dcfe04fa47e7e3ec3748864fd77e72868c76a4"
+    },
+    {
+      "path": "effect\\base\\cm\\cm000\\cm000_000",
+      "kind": "MOD",
+      "bytes": 31178,
+      "sha256": "60ce8f37a5d510f205cbad7a26ed24626acca2f73f0b08f8e082dc60ecf5f266"
+    },
+    {
+      "path": "effect\\base\\cm\\cm000\\cm000_000",
+      "kind": "MRL",
+      "bytes": 656,
+      "sha256": "20698a2e31faca55a68c985f240a864680373197285ae0b007183b0de196b872"
+    },
+    {
+      "path": "effect\\base\\cm\\cm000\\cm000_GSM_HQ_NOMIP",
+      "kind": "TEX",
+      "bytes": 262164,
+      "sha256": "cf78886b504cab08d6e87998ef9a6f68feaff1200a98513ad545bc88b1b82b8c"
+    },
+    {
+      "path": "effect\\base\\qe\\qe000\\qe000_001",
+      "kind": "MOD",
+      "bytes": 32106,
+      "sha256": "58b78c99fcf3935cb66feca294c9c107ffd2c11e3a852bdd60896e88ce078617"
+    },
+    {
+      "path": "effect\\base\\qe\\qe000\\qe000_001",
+      "kind": "MRL",
+      "bytes": 656,
+      "sha256": "44f7890e154c4d9f80827ee62c7d11f69ef25099e99cca3d3a294271cb0929eb"
+    },
+    {
+      "path": "effect\\base\\qe\\qe000\\qe000_BM_NOMIP",
+      "kind": "TEX",
+      "bytes": 32788,
+      "sha256": "b36f925b17612cf1c7a0f93472eeba28361a1c0a81771b34fe6bcfa9efde4b39"
+    },
+    {
+      "path": "effect\\base\\qe\\qe001\\qe001",
+      "kind": "EAN",
+      "bytes": 4544,
+      "sha256": "3ca0268173edb3687784dba1a3425675d4f6bb98d0048c3ea583c483d1a43122"
+    },
+    {
+      "path": "effect\\base\\qe\\qe001\\qe001_000",
+      "kind": "MOD",
+      "bytes": 142382,
+      "sha256": "cde216992182027769d3571129fbf0af5c226bb19b7cdc3a442a43246bb437d0"
+    },
+    {
+      "path": "effect\\base\\qe\\qe001\\qe001_000",
+      "kind": "MRL",
+      "bytes": 1136,
+      "sha256": "9f7297a655cfbcad70985267d239805da528fce1d04aa517da4ce25781459347"
+    },
+    {
+      "path": "effect\\base\\qe\\qe001\\qe001_001_BM_NOMIP",
+      "kind": "TEX",
+      "bytes": 8212,
+      "sha256": "28c19a7451f6db56fd88f039b3f7c900c5755ebdce3511a8017e986f18fc2d76"
+    },
+    {
+      "path": "effect\\base\\qe\\qe001\\qe001_BM_NOMIP",
+      "kind": "TEX",
+      "bytes": 262164,
+      "sha256": "9d4efe5177669b75c2da24e157d98de1094b5db5646a44ceb3863258c019bb4a"
+    },
+    {
+      "path": "effect\\base\\wp\\gaxe\\gaxe",
+      "kind": "MOD",
+      "bytes": 10622,
+      "sha256": "90b9027babca489b2fa040bb47ad9a98a850c2d11283755aefb0e507a43aa232"
+    },
+    {
+      "path": "effect\\base\\wp\\gaxe\\gaxe",
+      "kind": "MRL",
+      "bytes": 656,
+      "sha256": "20a596a0b964a96aae9e875dc8d73cd4b55dd6117800a63b0f0913ec12d571fe"
+    },
+    {
+      "path": "effect\\base\\wp\\gaxe\\gaxe_000_BM",
+      "kind": "TEX",
+      "bytes": 1304,
+      "sha256": "a5138bd8c333b1d1ae1bb4694bc494c405c0d3cbc59432c47390464af9a58efa"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_001",
+      "kind": "EFL",
+      "bytes": 5040,
+      "sha256": "9ca0caa116dd7f4e5281a9b4fff959fc29299c5385b7febe63e3ad17f830ec5f"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_002",
+      "kind": "EFL",
+      "bytes": 5328,
+      "sha256": "a080f9f59a360ad6a25b89d5923cf335046cd9f110293011e3d623f74094ce3e"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_003",
+      "kind": "EFL",
+      "bytes": 3904,
+      "sha256": "e5af573ccdd4bafba641bfb2cc1ec3a7f69286ee41708eaab23187c33cbbfede"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_004",
+      "kind": "EFL",
+      "bytes": 2272,
+      "sha256": "8983b01801f5009a13fe3547f52c7ae0ac70cfe3f523aff4100357d3d8963b4a"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_005",
+      "kind": "EFL",
+      "bytes": 10288,
+      "sha256": "fc2ca21db41c432543e391ce157d9e4d034228412804e73c3c1c5cf73d2a442f"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_006",
+      "kind": "EFL",
+      "bytes": 4384,
+      "sha256": "cdc69ce823e1033f1684839acee9075ad0b51090355c7cf3563c08d2c0c82d9b"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_007",
+      "kind": "EFL",
+      "bytes": 10800,
+      "sha256": "fc90c7ba05a0ee4e0aedb3ace700d9a69891a9c182af68e7bb60c50087305831"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_008",
+      "kind": "EFL",
+      "bytes": 18128,
+      "sha256": "cc24a8f9fef2b61d73093864f170c61cef199130f61c330f94ea55e3204d80f4"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_009",
+      "kind": "EFL",
+      "bytes": 17824,
+      "sha256": "e3a2c43ecaae921251cf9e88a5aafef276f869cfe7a4d35c24ebf7d2a8690fc4"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_010",
+      "kind": "EFL",
+      "bytes": 4592,
+      "sha256": "3fc19e6f58120585dfbc73bff48a927cc57fa325ff81da8e7eed03f9acecc720"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_011",
+      "kind": "EFL",
+      "bytes": 4176,
+      "sha256": "50165292b97c24c26a9caf85ee3545ae92538d7995f0ac05c2be82029341e54b"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_012",
+      "kind": "EFL",
+      "bytes": 5872,
+      "sha256": "b8be256a363b51c1b28414be1bf641ab665db625a9d16a0c707ac8eecb2ff5b0"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_013",
+      "kind": "EFL",
+      "bytes": 6592,
+      "sha256": "41378169ebccf32013a3116c0109a78e1a1cb97cb8c15f557c37fb49fd527ae5"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_014",
+      "kind": "EFL",
+      "bytes": 1632,
+      "sha256": "fefcfa656428e56850c1c888f1421f40aadad54f113ac515a697fc9f5b37fcf4"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_015",
+      "kind": "EFL",
+      "bytes": 2032,
+      "sha256": "dfce78a24ea65c2b3f822ea6d447284787667399442a903022e008a3d9e574e3"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_016",
+      "kind": "EFL",
+      "bytes": 2288,
+      "sha256": "26a5bd3b58b858e727fe3006fcde8766fa625bd034d4cd22f13c9dc9e2e5ff63"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_017",
+      "kind": "EFL",
+      "bytes": 5056,
+      "sha256": "ac6256a09c6d11ab619e1d8ed59af695dc995725a939a30139cfc85954eeabd0"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_018",
+      "kind": "EFL",
+      "bytes": 2896,
+      "sha256": "db2d13c0aae09ef6c0950e61ea2a929a1c4e30b5c4676ad7fcdf256409b65256"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_050",
+      "kind": "EFL",
+      "bytes": 880,
+      "sha256": "d833d2d6bcbebc8f51d5b98f690afa2276881e82920127c91cd669b1e93fc27f"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_051",
+      "kind": "EFL",
+      "bytes": 880,
+      "sha256": "9ddc3fc26edcaa34bf9adf185bc86e9fa09b60acc5f46d2fdfe97088267aeaf8"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_100",
+      "kind": "EFL",
+      "bytes": 8368,
+      "sha256": "80daac8c0b0ebd080158fab6dd63027fa9fa5d61b6103c7efa41443043957c60"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_101",
+      "kind": "EFL",
+      "bytes": 1632,
+      "sha256": "7a17db36ed030f7b810f7636b899147d534ac7fa6a5328410dbe7bf3fff9ba9c"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_102",
+      "kind": "EFL",
+      "bytes": 2432,
+      "sha256": "55ee08620c47fdbd76b2364f601ee49f6f5baa7e6ac9bc42f6cf5d05cecb8590"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_103",
+      "kind": "EFL",
+      "bytes": 19776,
+      "sha256": "839272f2cfece2f3c05f76e162e3f2d372aec9a4a1048403c908f07aa10335da"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_104",
+      "kind": "EFL",
+      "bytes": 13776,
+      "sha256": "94c06a68b31d50dd85ffdad42558d79f7469fffe682b71474b0071cd132c44a0"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_105",
+      "kind": "EFL",
+      "bytes": 10336,
+      "sha256": "db87466e175bf657b1733f7674a5e789a676819ed9d137f0395bb7c176b5b830"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_106",
+      "kind": "EFL",
+      "bytes": 13248,
+      "sha256": "e302c4035db345344e49e295f212c384cb1f80c29daadf7a553820304cf02d6d"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_107",
+      "kind": "EFL",
+      "bytes": 36336,
+      "sha256": "5812dd9ae692049b0adb760cc415d827d733ef5e04fea4e9ab792e584791dbb1"
+    },
+    {
+      "path": "effect\\efl\\wp\\gaxe\\gaxe_108",
+      "kind": "EFL",
+      "bytes": 5024,
+      "sha256": "e8efa7c027b960e268149bd188e07af28cfe21f995ebe3e4e2faaa9283fd1d2e"
+    }
+  ],
+  "archive": {
+    "file": "cb_gaxe_preview_4g.arc",
+    "bytes": 560477,
+    "sha256": "e0e96000ee236694ea3337c7dfb98f9a1cbaad0c7829fe02f27eb1639349b825"
+  },
+  "limitations": [
+    "Each effect still needs visual identification in GU.",
+    "Preview uses selected group mask and a configurable player/shield anchor; original motion placement is not implied.",
+    "4G fixed-function intensity and scene colours need visual comparison."
+  ]
+}

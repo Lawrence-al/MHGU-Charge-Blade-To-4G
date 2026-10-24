@@ -42,6 +42,7 @@ pub enum Value {
     Bool(bool),
     Integer(u32),
     Float(f32),
+    IdSet(u8),
 }
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -49,6 +50,26 @@ impl fmt::Display for Value {
             Self::Bool(v) => v.fmt(f),
             Self::Integer(v) => v.fmt(f),
             Self::Float(v) => v.fmt(f),
+            Self::IdSet(bits) => {
+                if *bits == 0 {
+                    return f.write_str("none");
+                }
+                if *bits == u8::MAX {
+                    return f.write_str("all");
+                }
+                let mut comma = false;
+                for id in 0..8 {
+                    if bits & (1 << id) == 0 {
+                        continue;
+                    }
+                    if comma {
+                        f.write_str(",")?;
+                    }
+                    write!(f, "{id}")?;
+                    comma = true;
+                }
+                Ok(())
+            }
         }
     }
 }

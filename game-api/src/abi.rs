@@ -17,6 +17,21 @@ pub unsafe extern "C" fn trig_call(_function: u32, _radians: u32) -> u32 {
     );
 }
 
+/// IS_ack接受r0=玩家、s0=目标动画帧，返回r0；不改变原生跨帧/暂停判定。
+#[cfg(target_arch = "arm")]
+#[unsafe(naked)]
+pub unsafe extern "C" fn frame_event(_function: u32, _player: u32, _frame: u32) -> u32 {
+    naked_asm!(
+        ".arm",
+        "push {{r4, lr}}",
+        "mov r12, r0",
+        "mov r0, r1",
+        "vmov s0, r2",
+        "blx r12",
+        "pop {{r4, pc}}",
+    );
+}
+
 #[cfg(target_arch = "arm")]
 #[unsafe(naked)]
 pub unsafe extern "C" fn float_call8(_function: u32, _arguments: *const [u32; 8]) -> u32 {
@@ -45,6 +60,11 @@ pub unsafe extern "C" fn float_call8(_function: u32, _arguments: *const [u32; 8]
 // 主机检查只验证对象／参数布局，不以主机 ABI 调用游戏函数。
 #[cfg(not(target_arch = "arm"))]
 pub unsafe fn trig_call(_: u32, _: u32) -> u32 {
+    unreachable!("ARM32 VFP 调用仅支持游戏进程")
+}
+
+#[cfg(not(target_arch = "arm"))]
+pub unsafe fn frame_event(_: u32, _: u32, _: u32) -> u32 {
     unreachable!("ARM32 VFP 调用仅支持游戏进程")
 }
 

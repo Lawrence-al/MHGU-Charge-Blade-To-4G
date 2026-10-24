@@ -9,10 +9,65 @@ impl Resource {
     pub const fn from_address(address: u32) -> Self {
         Self(address)
     }
+    pub const fn address(self) -> u32 {
+        self.0
+    }
+
+    pub unsafe fn load_flags(self) -> u32 {
+        unsafe { memory::read_u32(self.0 + 0x50) }
+    }
+
+    pub unsafe fn archive_entry_count(self) -> u32 {
+        unsafe { memory::read_u32(self.0 + 0x68) }
+    }
+
+    pub unsafe fn pel_group_counts(self) -> [u32; 3] {
+        core::array::from_fn(|group| unsafe {
+            memory::read_u32(self.0 + 0x68 + group as u32 * 20)
+        })
+    }
+
+    pub unsafe fn release(self, game: Game) {
+        let release: unsafe extern "C" fn(u32) = unsafe { game.function(0x00887660) };
+        unsafe { release(self.0) };
+    }
     /// MtResource 内嵌 64 字节路径；沿用 load 成功后的有效资源前提。
     pub unsafe fn path(&self) -> &[u8] {
         unsafe { core::slice::from_raw_parts((self.0 + 8) as *const u8, 64) }
     }
+}
+
+/// rArchive 的内存加载路径。资源数据由原游戏分配，输入 ARC 保持只读。
+/// 使用方必须持有返回的 ARC 引用，直到其中所有依赖均不再使用。
+pub unsafe fn load_embedded_archive(
+    game: Game,
+    path: &core::ffi::CStr,
+    bytes: &'static [u8],
+) -> Resource {
+    // MtMemoryStream 的已用字段到 +0x18；多保留一字，构造后仍使用原游戏析构。
+    let mut stream = [0u32; 8];
+    let construct: unsafe extern "C" fn(*mut u32, *const u8, u32, u32) -> u32 =
+        unsafe { game.function(0x008385E8) };
+    let destruct: unsafe extern "C" fn(*mut u32) -> u32 =
+        unsafe { game.function(0x00838634) };
+    let load: unsafe extern "C" fn(u32, *mut u32, u32, *const core::ffi::c_char, u32) -> u32 =
+        unsafe { game.function(0x00BCA65C) };
+    let manager = unsafe { memory::read_u32(game.address(0x02126A64)) };
+    unsafe { construct(stream.as_mut_ptr(), bytes.as_ptr(), bytes.len() as u32, 1) };
+    // 与原 DLC 内存 ARC 相同：DTI=rArchive，质量档位 4；同步 load/loadEnd。
+    let archive = unsafe {
+        load(manager, stream.as_mut_ptr(), game.address(0x02124DF0), path.as_ptr(), 4)
+    };
+    unsafe { destruct(stream.as_mut_ptr()) };
+    Resource(archive)
+}
+
+/// 只在已加载 ARC 的缓存里查询 PEL，不尝试从 romfs 查找同名裸文件。
+pub unsafe fn find_loaded_pel(game: Game, path: &core::ffi::CStr) -> Resource {
+    let manager = unsafe { memory::read_u32(game.address(0x02126A64)) };
+    let load: unsafe extern "C" fn(u32, u32, *const core::ffi::c_char, u32) -> u32 =
+        unsafe { memory::method(manager, 0x30) };
+    Resource(unsafe { load(manager, game.address(0x01889FDC), path.as_ptr(), 0x80) })
 }
 
 pub const SRQ_HEADER_SIZE: usize = 0x34;

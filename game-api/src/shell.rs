@@ -17,6 +17,18 @@ impl SaedShell {
     pub const fn address(self) -> u32 {
         self.0
     }
+    /// 00488ACC构造的uShellPlw14_003；与setup资源的类型号是不同字段。
+    pub unsafe fn is_instance(self, game: Game) -> bool {
+        unsafe { memory::load_u32(self.0) == game.address(0x01762F4C) }
+    }
+
+    /// 初始化后的实际攻击元素位，包含原游戏装备及特殊条件处理结果。
+    pub unsafe fn element_flags(self) -> u64 {
+        unsafe {
+            u64::from(memory::load_u32(self.0 + 0x15A8))
+                | (u64::from(memory::load_u32(self.0 + 0x15AC)) << 32)
+        }
+    }
     pub unsafe fn params(self) -> ShellParams {
         ShellParams(unsafe { memory::load_u32(self.0 + 0x136C) })
     }

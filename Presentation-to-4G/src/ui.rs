@@ -21,6 +21,44 @@ fn draw_settings() {
             .with(|edit| {
                 let c = &mut edit.draft;
                 imgui::checkbox(c"Enable Presentation plugin", &mut c.enabled);
+                imgui::separator_text(c"4G explosions and phial effects");
+                imgui::checkbox(c"AED hit / ground explosion (gaxe_005 tail)", &mut c.four_g.aed_explosion);
+                imgui::checkbox(c"SAED ground explosion with phials (gaxe_103 tail)", &mut c.four_g.saed_explosion);
+                imgui::checkbox(c"Phial attachment (gaxe_002)", &mut c.four_g.phial_attachment);
+                imgui::checkbox(c"ED I / II phial bursts (gaxe_003 / 008)", &mut c.four_g.ed_blast);
+                imgui::checkbox(c"AED phial bursts (gaxe_006 / 009)", &mut c.four_g.aed_blast);
+                imgui::checkbox(c"SAED phial bursts (gaxe_107)", &mut c.four_g.saed_blast);
+                imgui::text("SAED phial bursts are off by default; GU phial bursts are used instead.");
+                imgui::text("Explosions use extracted second stages; the original lightning is not replaced.");
+                imgui::text("AED hits use the contact point and cancel its ground explosion. Empty SAED has no 103.");
+                imgui::text("Phial attachment 002 disappears when the first phial burst begins.");
+                imgui::text("Converted resources are embedded in this plugin. Restart after saving.");
+                crate::preview::draw();
+
+                imgui::separator_text(c"GU lightning");
+                imgui::checkbox(c"Enable timed GU lightning", &mut c.effects);
+                imgui::checkbox(c"Red-shield thrust lightning", &mut c.shield_thrust);
+                frame_input(
+                    c"Thrust lightning duration",
+                    &mut c.shield_thrust_duration,
+                    0.1,
+                );
+                imgui::text("GU resources, shield attachment and task durations are retained.");
+                task_group(
+                    c"AED / SAED lightning tasks",
+                    "action",
+                    ACTION_TASKS,
+                    &mut c.action,
+                    false,
+                );
+                task_group(
+                    c"AED preparation lightning tasks",
+                    "burst",
+                    BURST_ACTION_TASKS,
+                    &mut c.burst,
+                    false,
+                );
+
                 imgui::separator_text(c"Sound");
                 imgui::checkbox(
                     c"Custom timed sounds / block duplicate MSS sounds",
@@ -35,28 +73,19 @@ fn draw_settings() {
                     12.0,
                     ImGuiSliderFlags::None,
                 );
-                imgui::separator_text(c"Shield lightning");
-                imgui::checkbox(c"Enable shield lightning", &mut c.effects);
-                imgui::checkbox(c"Red-shield thrust lightning", &mut c.shield_thrust);
-                frame_input(
-                    c"Thrust lightning duration",
-                    &mut c.shield_thrust_duration,
-                    0.1,
-                );
-                imgui::text(
-                    "Effect IDs and attachment stay on the shield, selected by phial type.",
-                );
                 task_group(
-                    c"AED / SAED action tasks",
+                    c"AED / SAED sound tasks",
                     "action",
                     ACTION_TASKS,
                     &mut c.action,
+                    true,
                 );
                 task_group(
-                    c"AED preparation tasks",
+                    c"AED preparation sound tasks",
                     "burst",
                     BURST_ACTION_TASKS,
                     &mut c.burst,
+                    true,
                 );
                 settings_menu::footer(
                     edit,
@@ -76,11 +105,13 @@ fn frame_input(label: &CStr, value: &mut f32, min: f32) {
     }
 }
 
-fn task_group(label: &CStr, prefix: &str, tasks: &[ActionTask], values: &mut [TaskSettings]) {
+fn task_group(label: &CStr, prefix: &str, tasks: &[ActionTask], values: &mut [TaskSettings], show_sound: bool) {
     if !imgui::tree_node(label) {
         return;
     }
     for (i, (task, value)) in tasks.iter().zip(values).enumerate() {
+        // 仅按用途筛选显示；仍保留原任务索引及同一份INI设置，不改触发逻辑。
+        if matches!(&task.action, TaskAction::PlaySe { .. }) != show_sound { continue; }
         let mut title = Text::<128>::new();
         match &task.action {
             TaskAction::PlaySe { request_id, .. } => {
@@ -92,7 +123,7 @@ fn task_group(label: &CStr, prefix: &str, tasks: &[ActionTask], values: &mut [Ta
                 ..
             } => write!(
                 title,
-                "{prefix}.{i}: lightning 0x{effect_id:X} / 0x{element_effect_id:X}"
+                "{prefix}.{i}: weapon effect 0x{effect_id:X} / 0x{element_effect_id:X}"
             )
             .unwrap(),
         }
@@ -109,6 +140,7 @@ fn task_group(label: &CStr, prefix: &str, tasks: &[ActionTask], values: &mut [Ta
             frame_input(c"Trigger frame", &mut value.frame, 0.0);
             if matches!(&task.action, TaskAction::CreateShieldEffect { .. }) {
                 frame_input(c"Duration frames", &mut value.duration_frames, 0.1);
+                imgui::text("Original GU lightning duration; independent of the 4G explosion options.");
             }
             imgui::tree_pop();
         }

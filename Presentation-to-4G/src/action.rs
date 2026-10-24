@@ -141,9 +141,13 @@ pub unsafe fn on_burst_action_frame(player: ChargeBladePlayer, variant: u32, act
 
 /// 执行一条任务（要加新动作类型就在 match 里加分支）
 ///
-/// 参数：`player_actor` 本次动作的玩家对象，特效直接使用其盾牌
+/// GU闪电始终走原盾牌路径，后段爆炸另由实际动作/瓶爆事件创建。
 /// 参数：`task_action` 任务内容
-unsafe fn execute_task(player: ChargeBladePlayer, task_action: &TaskAction, duration_frames: f32) {
+unsafe fn execute_task(
+    player: ChargeBladePlayer,
+    task_action: &TaskAction,
+    duration_frames: f32,
+) {
     match task_action {
         TaskAction::PlaySe {
             request_id,

@@ -1,6 +1,6 @@
 # 当前代码结构
 
-游戏字段、原生调用和功能规则分为三层：`game-api` 定义对象及调用方法；Presentation／Moveset 保存各自规则与运行状态；`hooks.rs` 将原始 ARM 参数转换成对象后转发。两个插件继续各自产出一份 NRO，没有第三个插件，也没有跨 NRO 的状态或调用顺序依赖。
+游戏字段、原生调用和功能规则分为三层：`game-api` 定义对象及调用方法；各插件保存规则与运行状态；钩子将原始 ARM 参数转换成对象后转发。当前仅Presentation／Moveset各自产出一份NRO，不共享跨NRO状态；Style已合并到Moveset。新动作调用游戏原前置入口，因而能继续经过Presentation已安装的表现钩子。
 
 ## 文件职责
 
@@ -17,10 +17,16 @@
 | `Presentation/src/action.rs` / `tasks.rs` | `ActionRunner` 管理两份任务状态，静态任务表保存帧与规则 |
 | `Presentation/src/state.rs` | `PresentationState` 管理玩家／音序／SE 缓存与原子计数 |
 | `Presentation/src/effect.rs` | 特效持续时间登记、到期停止、盾突红盾条件 |
+| `Presentation/src/gaxe.rs` | 独立4G剑特效创建与预览共用的ARC/PEL缓存；不替换effect.rs的GU创建器 |
 | `Presentation/src/sound.rs` / `resource.rs` | MSS 拦截与播放规则、盾斧 SRQ／PTS 修改规则 |
 | `Presentation/src/debug.rs` | 特效 ID 和任务表日志，默认不编译、不安装日志钩子 |
 | `Moveset/src/moveset.rs` | 按功能命名的直接补丁、保持寄存器的 ARM 桥接 |
-| `Moveset/src/overpowered.rs` | 原派生初始化后为每玩家合并表，保留原大解与红盾记录，追加当前风格后摇 |
+| `Moveset/src/guard.rs` | 4G GP 威力修正及红盾硬直阈值 |
+| `Moveset/src/style/menu.rs` | 原版4G菜单、比较/确认桥、保留已有额外风格行 |
+| `Moveset/src/style/actions.rs` | 常驻0xAA/0xAB、逻辑variant16/17、按风格重定向临时命令 |
+| `Moveset/src/style/mod.rs` / `selection.rs` | 六项功能统一按0..7编号判断，本机4G映射6、资源仍公会 |
+| `Moveset/src/config/styles.rs` | 每个集合一个u8；黄盾变AED默认3/6，GP后退/防性默认6，后三项none；战斗中只查位 |
+| `Moveset/src/overpowered.rs` | 按风格建立玩家表副本，保留原记录，分别追加大解后摇或小退/中退X+A入口 |
 | `Moveset/src/saed/schedule.rs` / `phial.rs` | 纯时间／轨迹计算、瓶爆更新和记录管理 |
 | `Moveset/src/hitdata/mod.rs` / `records.rs` | 单一加载扩容入口、asset／原版 0x4F／新增 0x50 快照 |
 | 两项目 `config.rs` / `config_file.rs` / `ui.rs` | 纯 INI 解析与输出、启动读取一次、Forge 菜单编辑草稿 |
@@ -28,7 +34,7 @@
 | `shared/runtime_hook.rs` | 项目内无 context 钩子，提供清零的 76 字节返回区，容纳当前 Forge 的 24 字节 Hook |
 | `shared/patch.rs` / `Moveset/src/patches.rs` | 补丁核对与安装、启动配置选择 |
 
-表中 Presentation 和 Moveset 分别指 `Presentation-to-4G`、`Moveset-to-4G`。
+表中 Presentation、Moveset、Style 分别指 `Presentation-to-4G`、`Moveset-to-4G`、`Style-to-4G`。
 
 ## 游戏对象的写法
 
@@ -42,7 +48,7 @@ let reference = unsafe { shield.reference() };
 let kind = unsafe { player.phial_kind() };
 ```
 
-字段偏移只在对应对象文件维护。`player.sound_sequence()` 返回内嵌对象地址 `player+0x111C`；`sequence.owner()` 读取 `sequence+0x164` 指针值。`player.shield()` 读取 `player+0x23A4`；盾牌 `reference()` 通过虚表 `+0x130` 取得引用。装备参数 27 与瓶爆参数的资源子类型分别由 `Equipment::phial_kind()` 和 `ShellParams::kind()` 解码，两者使用不同原始字段。
+字段偏移只在对应对象文件维护。`player.sound_sequence()` 返回内嵌对象地址 `player+0x111C`；`sequence.owner()` 读取 `sequence+0x164` 指针值。`player.shield()` 读取 `player+0x23A4`，`player.sword()`读取`player+0x23A0`；两种武器对象的`reference()`均通过虚表`+0x130`取得引用。GU盾牌特效保持bone0；可选4G序列使用Sword，005用根矩阵(-1)、103用骨骼0。装备参数27与瓶爆参数的资源子类型分别由`Equipment::phial_kind()`和`ShellParams::kind()`解码，两者使用不同原始字段。
 
 对象方法沿用原钩子中玩家、装备、盾牌及资源已经有效的前提；没有添加空指针兜底。游戏拥有这些对象，地址对象只在对应生命周期内使用。节点和 shell 的析构钩子继续撤销各自计时记录。
 
@@ -88,9 +94,9 @@ Forge SDK 与 cargo-forge 固定为同一 Git 提交 `f2af0622a2a0aa291ffbd3d2f7
 |---|---|---|
 | `bash build.sh`，两个 release ELF 与 `dist/*.nro` | Forge 来源为固定 Git 提交，构建不访问本机工作区 SDK | 项目内准备打包工具 → 编译两项目 → 输出到 dist |
 | `bash test.sh` | 默认回归不需要历史目录、私有工具或游戏文件 | ELF/NRO 检查 → 配置和菜单 → 实际 ARM 与动作回归 |
-| `bash test.sh "MHGU dump" "4G ELF" "Forge NSO"`（需自行准备原版文件） | 可额外检查实际导入提供者、GU 原指令、HDP、4G 时序和轨迹 | 只读本地原版文件 → 比对生成的两个 NRO |
+| `bash test.sh "MHGU dump" "4G ELF" "Forge NSO"`（需自行准备原版文件） | 可额外检查实际导入提供者、GU 原指令、HDP、4G 时序和轨迹 | 只读本地原版文件 → 比对生成的三个 NRO |
 
 测试不代替实机或模拟器中的战斗验证。普通测试不自动部署文件，不修改游戏存档。测试报告输出到各项目的 `target/build-verification.json`。
 
-隔离复验使用了无相邻 SDK、目录名含空格的源码副本：`bash build.sh --offline` 完成两个 release 构建。最终工作副本也完成 PowerShell `-Offline` 构建、基础与原版数据比对。`build.ps1` 使用带 BOM 的 UTF-8，确保 Windows PowerShell 5 能识别中文注释后的参数声明。部署测试仅在临时插件目录复制两个 NRO，并核对其它插件和 INI 未变。
+2026-10-19 的隔离复验使用无相邻 SDK、目录名含空格的源码副本，完成当时两个 release 构建；工作副本也完成 PowerShell `-Offline` 构建、基础与原版数据比对。`build.ps1` 使用带 BOM 的 UTF-8，确保 Windows PowerShell 5 能识别中文注释后的参数声明。2026-10-22 增加 Style 后，已从当前工程统一离线构建三个 NRO，完成原版数据及装载比对，并部署到游戏插件目录，逐个核对字节一致；现有 INI 和 ARC 没有被覆盖。本轮没有另做三项目隔离副本构建。
 

@@ -10,7 +10,7 @@ function cmd(c){
 }
 for(const style of styles){
   const axe=style.tables.find(t=>t.chain===0x7DC).commands;
-  for(const chain of [0x7F4,0x7F5,0x839,0x83A]){
+  for(const chain of [0x7F4,0x7F5,0x839,0x83A,0x802,0x803]){
     const original=style.tables.find(t=>t.chain===chain).commands;
     fixtures.push(`Fixture{style:${style.style},chain:${chain},original:&[${original.map(cmd)}],axe:&[${axe.map(cmd)}]}`);
   }
@@ -35,6 +35,15 @@ extern crate alloc;
 extern crate self as forge;
 use std::{cell::RefCell,collections::BTreeMap};
 ${gameModules()}
+${modulePath('Moveset-to-4G/src/config.rs','config')}
+thread_local!{static CONFIG:core::cell::Cell<config::Config>=const{core::cell::Cell::new(config::Config::DEFAULT)};}
+mod style{
+ pub enum Feature{AedFollowups,GuardRecoilYellow}
+ pub unsafe fn enabled_for(player:crate::player::ChargeBladePlayer,feature:Feature)->bool{
+  let c=crate::CONFIG.get();let e=unsafe{player.equipment()};let id=unsafe{e.style()} as u16;
+  c.enabled&&unsafe{e.weapon_type()}==14&&match feature{Feature::AedFollowups=>c.styles.aed_followups.contains(id),Feature::GuardRecoilYellow=>c.styles.guard_recoil_yellow.contains(id)}
+ }
+}
 #[path=${rustPath(adapter)}] mod overpowered;
 thread_local!{static FIELDS:RefCell<BTreeMap<u32,u32>>=const{RefCell::new(BTreeMap::new())};static LOGS:RefCell<Vec<String>>=const{RefCell::new(Vec::new())};}
 #[macro_export] macro_rules! error{($($arg:tt)*)=>{crate::LOGS.with(|l|l.borrow_mut().push(format!($($arg)*)))};}
@@ -76,18 +85,21 @@ fn setup(f:&Fixture,slot:u32,player:u32,weapon:u32)->Native{
 fn original_memory_preserved(before:BTreeMap<u32,u32>,player:u32){FIELDS.with(|f|{let after=f.borrow();for(a,v)in before{if a!=player+0x24A8{assert_eq!(after[&a],v,"changed native memory {a:X}");}}});}
 fn merged(n:&Native,f:&Fixture)->(u32,Vec<u32>){
  let(p,h,refs,words)=overpowered::test_snapshot(n.player).unwrap();assert_eq!(get(n.player+0x24A8),p);assert_eq!(get(n.player+0x24AC),f.chain);
- let expected:Vec<_>=n.orig_refs.iter().copied().chain(n.axe_refs.iter().skip(1).copied()).collect();assert_eq!(refs,expected);
+ let guard=matches!(f.chain,0x802|0x803);
+ let extra:Vec<_>=if guard{vec![n.orig_refs[1]]}else{n.axe_refs.iter().skip(1).copied().collect()};
+ let expected:Vec<_>=n.orig_refs.iter().copied().chain(extra).collect();assert_eq!(refs,expected);
  let mut header=unsafe{command::CommandTable::from_address(n.original).header()};header.count=expected.len() as u32;header.records=h.records;assert_eq!(h,header);
- if let Some(first)=n.axe_refs.first(){assert!(!refs.contains(first),"axe bounce record appended");}
+ if !guard{if let Some(first)=n.axe_refs.first(){assert!(!refs.contains(first),"axe bounce record appended");}}
  // 用表实际指针和数量走与游戏相同的读取路径，验证不是只返回一份期望 Vec。
  for(a,v)in words{put(a,v);}
  let view=command::CommandTable::from_address(p);assert_eq!(unsafe{view.count()},expected.len() as u32);
- for(i,&r)in expected.iter().enumerate(){assert_eq!(unsafe{view.record(i)},r);let payload:Vec<_>=(0..8).map(|j|get(r+j*4)).collect();let data=if i<f.original.len(){f.original[i]}else{f.axe[i-f.original.len()+1]};assert_eq!(payload,data);}
+ for(i,&r)in expected.iter().enumerate(){assert_eq!(unsafe{view.record(i)},r);let payload:Vec<_>=(0..8).map(|j|get(r+j*4)).collect();let data=if i<f.original.len(){f.original[i]}else if guard{f.original[1]}else{f.axe[i-f.original.len()+1]};assert_eq!(payload,data);}
  if f.chain==0x7F4{assert_eq!(get(refs[0])>>16,0x39);assert_eq!(get(refs[0]+8),5);assert_eq!(get(refs[0]+24),28<<16);assert_eq!(get(refs[0]+28)&0xFFFF,0);}
  (p,refs)
 }
 fn main(){
  overpowered::init();let mut total=0;let mut first=None;
+ let mut c=config::Config::DEFAULT;c.styles.aed_followups=config::StyleSet::ALL;c.styles.guard_recoil_yellow=config::StyleSet::ALL;CONFIG.set(c);
  for(i,f)in FIXTURES.iter().enumerate(){for repeat in 0..3{
   let actor=0x10000000+i as u32*0x10000;let n=setup(f,i as u32*3+repeat,actor,14);let before=FIELDS.with(|f|f.borrow().clone());
   unsafe{overpowered::after_chain_init(player::ChargeBladePlayer::from_address(actor),f.chain)};
@@ -116,6 +128,13 @@ fn main(){
  let large=Fixture{style:5,chain:0x7F4,original:Box::leak(full.into_boxed_slice()),axe:Box::leak(Box::new(one))};
  let n=setup(&large,102,0x12020000,14);unsafe{overpowered::after_chain_init(player::ChargeBladePlayer::from_address(n.player),large.chain)};assert_eq!(get(n.player+0x24A8),n.original);LOGS.with(|l|assert!(l.borrow().last().unwrap().contains("48+1")));
  let empty=Fixture{style:5,chain:0x839,original:&[],axe:&[]};let n=setup(&empty,103,0x12030000,14);unsafe{overpowered::after_chain_init(player::ChargeBladePlayer::from_address(n.player),empty.chain)};assert_eq!(get(n.player+0x24A8),n.original);
- println!("PASS: {total} real resource merge/reload cases, six styles / four AED chains; original red-shield/input/windows/header retained, axe entry 0 excluded, stable per-player storage, style changes/chain exit, no duplicate append, no native resource writes; rejected/non-CB/normal chains and capacity bound");
+ // 六风格的AED与防御后追加分别按列表启停；关闭不替换当前原表。
+ for (i,f) in FIXTURES.iter().enumerate(){
+  let n=setup(f,200+i as u32,0x14000000+i as u32*0x10000,14);
+  let mut off=c;off.styles.aed_followups=config::StyleSet::NONE;off.styles.guard_recoil_yellow=config::StyleSet::NONE;CONFIG.set(off);
+  unsafe{overpowered::after_chain_init(player::ChargeBladePlayer::from_address(n.player),f.chain)};assert_eq!(get(n.player+0x24A8),n.original);
+  CONFIG.set(c);
+ }
+ println!("PASS: {total} real resource merge/reload cases, six styles / four AED plus small/medium guard chains; all original commands/windows retained, guard extra borrows original entry 1, per-style disable, stable storage, no duplicate append or native resource writes; capacity bound");
 }
 `);

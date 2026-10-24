@@ -48,4 +48,4 @@ fn main() {
     println!("PASS: actual player.rs uses embedded sequence address +0x111C and reads owner once at +0x1280");
 }
 `);
-console.log('PASS: split Presentation task tables preserve all original sound frames, particle durations/types and MSS blocking values');
+console.log('PASS: original GU task frames/types/durations/sounds/MSS exactly preserve baseline');

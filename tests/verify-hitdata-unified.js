@@ -15,7 +15,8 @@ let adapter = source.slice(0, split)
 adapter += source.slice(split).replace('#[cfg(target_arch = "arm")]', '')
   .replace(/\bu32\b/g, 'usize').replace('accepts(path, count, config)', 'accepts(path, count as u32, config)');
 const resourceFile = path.join(dir, 'resource-host.rs');
-fs.writeFileSync(resourceFile, fs.readFileSync(path.join(root,'game-api/src/resource.rs'),'utf8').replace(/\bu32\b/g,'usize'));
+fs.writeFileSync(resourceFile, fs.readFileSync(path.join(root,'game-api/src/resource.rs'),'utf8')
+  .replace(/\bu32\b/g,'usize').replace(/\b(\d+)u32\b/g,'$1usize'));
 const adaptedFile = path.join(dir, 'hitdata-host.rs');
 fs.writeFileSync(adaptedFile, adapter);
 const hooks = fs.readFileSync(path.join(root, 'Moveset-to-4G/src/hooks.rs'), 'utf8');
@@ -89,22 +90,28 @@ fn main() {
     for count in [79u32,80,81] { for asset in [false,true] { for third in [false,true] { for enabled in [false,true] {
     for result in [0,1,7] { for _reload in 0..2 {
         let mut c=config::Config::DEFAULT; c.hitdata=asset;c.saed.enabled=third;c.enabled=enabled;config_file::set(c);
-        let mut loaded=input.to_vec();if count==81 { loaded.extend_from_slice(include_bytes!(${rustPath(path.join(root, 'tests/data/saed-hdp50.bin'))})); } loaded[8..12].copy_from_slice(&count.to_le_bytes());
+        // 已有 81 条时故意污染 0x50，确认公共加载会恢复新记录而不再次分配。
+        let mut loaded=input.to_vec();if count==81 { loaded.extend_from_slice(&[0xA5;56]); } loaded[8..12].copy_from_slice(&count.to_le_bytes());
         let data=loaded.clone().into_boxed_slice();let old=data.as_ptr() as usize;
         native::STATE.with(|s| *s.borrow_mut()=native::State{fields:BTreeMap::new(),buffers:vec![data],original:old,loads:0,allocations:0,frees:0});
         let mut resource=[0u8;128];resource[8..8+path.len()].copy_from_slice(path.as_bytes());let address=resource.as_mut_ptr() as usize;
         assert_eq!(unsafe{hook_hitdata_load(address,result)},result as u32);
-        let accepted=enabled&&(asset||third)&&!path.contains("we13")&&count>=80&&result!=0;
-        let extended=accepted&&third&&count==80;
+        let accepted=!path.contains("we13")&&count>=80&&result!=0;
+        let extended=accepted&&count==80;
         let mut expected=loaded;
         if extended {expected.extend_from_slice(include_bytes!(${rustPath(path.join(root, 'tests/data/saed-hdp50.bin'))}));expected[8..12].copy_from_slice(&81u32.to_le_bytes());}
-        if accepted&&asset {expected[16..16+79*56].copy_from_slice(&hitdata::records::ASSET[16..16+79*56]);expected[16+79*56..4496].copy_from_slice(original_4f);}
-        if accepted&&third {let offset=4496;expected[offset..4552].copy_from_slice(include_bytes!(${rustPath(path.join(root, 'tests/data/saed-hdp50.bin'))}));}
+        if accepted&&enabled&&asset {expected[16..16+79*56].copy_from_slice(&hitdata::records::ASSET[16..16+79*56]);expected[16+79*56..4496].copy_from_slice(original_4f);}
+        if accepted {let offset=4496;expected[offset..4552].copy_from_slice(include_bytes!(${rustPath(path.join(root, 'tests/data/saed-hdp50.bin'))}));}
         native::STATE.with(|s|{let s=s.borrow();assert_eq!(s.loads,1);assert_eq!(s.allocations,usize::from(extended));assert_eq!(s.frees,usize::from(extended));assert_eq!(s.buffers.len(),1);assert_eq!(s.buffers[0].as_ref(),expected,"path={path} count={count} asset={asset} third={third} enabled={enabled} result={result}");if result!=0 {let current=s.fields[&(address+0x64)];assert_eq!(current,s.buffers[0].as_ptr() as usize);assert_eq!(s.fields[&(address+0x68)],current+16);}});
+        // 同一资源再次进入补充逻辑时，已有的 81 条不得再分配／释放一次。
+        if accepted {
+            unsafe { hitdata::after_load(address,config_file::get()); }
+            native::STATE.with(|s|{let s=s.borrow();assert_eq!(s.loads,1);assert_eq!(s.allocations,usize::from(extended));assert_eq!(s.frees,usize::from(extended));assert_eq!(s.buffers.len(),1);assert_eq!(s.buffers[0].as_ref(),expected,"重复后处理改变了已扩容资源");});
+        }
         cases+=1;
     } } } } } }
     } }
-    println!("PASS: {cases} actual unified HDP loader/callback cases; original called once, both input files, independent Hitdata/SAED switches, fixed 0x50, 0x4F, return values, reload, allocator ownership and both resource pointers");
+    println!("PASS: {cases} actual unified HDP loader/callback cases; all plugin/Hitdata/SAED switches, always 81 records, fixed 0x50 even when disabled, original 80 records only under plugin+Hitdata, corrupt-81 repair, repeat/reload, allocator ownership and both resource pointers");
 }
 `, [originalFile]);
 const plugin = loadPlugin(path.join(root, 'Moveset-to-4G'), 'moveset_to_4g');

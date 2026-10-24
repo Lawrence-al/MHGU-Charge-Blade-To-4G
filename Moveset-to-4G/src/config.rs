@@ -1,6 +1,9 @@
 // INI 的缺省值与纯解析；不访问游戏内存，不在战斗中读取文件。
 #[path = "../../shared/ini.rs"]
 pub mod ini;
+#[path = "config/styles.rs"]
+pub mod styles;
+pub use styles::{StyleSet, StylesConfig};
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Config {
@@ -8,18 +11,15 @@ pub struct Config {
     pub moveset: MovesetConfig,
     pub saed: SaedConfig,
     pub hitdata: bool,
-    pub overpowered: bool,
+    pub style_selected: bool,
+    pub styles: StylesConfig,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MovesetConfig {
-    pub yellow_shield_aed: bool,
     pub shield_multiplier: bool,
-    pub gp_recoil: bool,
     pub j_guard_aed: bool,
-    pub bushi_shield_thrust_aed: bool,
     pub aed_camera_shake: bool,
-    pub aed_shake_strength: u8,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -37,52 +37,47 @@ pub struct ConfigError {
 
 impl Config {
     pub fn write_ini(&self, out: &mut dyn core::fmt::Write) -> core::fmt::Result {
-        use ini::Value::{Bool, Integer};
+        use ini::Value::{Bool, IdSet, Integer};
         ini::rewrite(
             include_str!("../../conf/cb_moveset_to_4g.ini"),
             out,
             |section, key| {
                 Some(match (section, key) {
                     ("plugin", "enabled") => Bool(self.enabled),
-                    ("moveset", "yellow_shield_aed") => Bool(self.moveset.yellow_shield_aed),
-                    ("moveset", "shield_multiplier") => Bool(self.moveset.shield_multiplier),
-                    ("moveset", "gp_recoil") => Bool(self.moveset.gp_recoil),
+                    ("values", "shield_multiplier") => Bool(self.moveset.shield_multiplier),
                     ("moveset", "j_guard_aed") => Bool(self.moveset.j_guard_aed),
-                    ("moveset", "bushi_shield_thrust_aed") => {
-                        Bool(self.moveset.bushi_shield_thrust_aed)
-                    }
-                    ("moveset", "aed_camera_shake") => Bool(self.moveset.aed_camera_shake),
-                    ("moveset", "aed_shake_strength") => {
-                        Integer(self.moveset.aed_shake_strength.into())
-                    }
+                    ("values", "aed_camera_shake") => Bool(self.moveset.aed_camera_shake),
                     ("saed", "enabled") => Bool(self.saed.enabled),
                     ("saed", "effect_gear") => Integer(self.saed.effect_gear.into()),
                     ("hitdata", "enabled") => Bool(self.hitdata),
-                    ("overpowered", "enabled") => Bool(self.overpowered),
+                    ("style", "selected") => Bool(self.style_selected),
+                    ("styles", "yellow_shield_aed") => IdSet(self.styles.yellow_shield_aed.0),
+                    ("styles", "gp_recoil") => IdSet(self.styles.gp_recoil.0),
+                    ("styles", "guard_performance") => IdSet(self.styles.guard_performance.0),
+                    ("styles", "shield_thrust_yellow") => IdSet(self.styles.shield_thrust_yellow.0),
+                    ("styles", "guard_recoil_yellow") => IdSet(self.styles.guard_recoil_yellow.0),
+                    ("styles", "aed_followups") => IdSet(self.styles.aed_followups.0),
                     _ => return None,
                 })
             },
         )
     }
 
-    // 默认启用常规 4G 修改，超模恢复默认关闭。
+    // 黄盾变AED默认3/6，GP后退与防性默认6；超解/数值仍全局，新增三项默认关闭。
     pub const DEFAULT: Self = Self {
         enabled: true,
         moveset: MovesetConfig {
-            yellow_shield_aed: true,
             shield_multiplier: true,
-            gp_recoil: true,
             j_guard_aed: true,
-            bushi_shield_thrust_aed: true,
             aed_camera_shake: true,
-            aed_shake_strength: 20,
         },
         saed: SaedConfig {
             enabled: true,
             effect_gear: 2,
         },
         hitdata: true,
-        overpowered: false,
+        style_selected: false,
+        styles: StylesConfig::DEFAULT,
     };
 
     /// 兼容 UTF-8 BOM、CRLF、空行、# / ; 注释；缺省项沿用 DEFAULT。
@@ -90,6 +85,10 @@ impl Config {
     pub fn parse(text: &str) -> Result<Self, ConfigError> {
         let mut config = Self::DEFAULT;
         let mut section = "";
+        // 兼容旧版总开关，但不保留两层控制：明确的风格列表始终优先。
+        // 仅有旧false而没有风格列表时迁移为none；旧true沿用各项新默认值。
+        let mut legacy_switches = [None; 3];
+        let mut explicit_styles = 0u8;
         for (index, line) in text.trim_start_matches('\u{FEFF}').lines().enumerate() {
             let line = line.split([';', '#']).next().unwrap().trim();
             let error = |message| ConfigError {
@@ -104,7 +103,19 @@ impl Config {
                     .strip_prefix('[')
                     .and_then(|s| s.strip_suffix(']'))
                     .ok_or_else(|| error("expected [section]"))?;
-                if !["plugin", "moveset", "saed", "hitdata", "overpowered"].contains(&section) {
+                if ![
+                    "plugin",
+                    "moveset",
+                    "saed",
+                    "hitdata",
+                    "aed_followups",
+                    "overpowered",
+                    "style",
+                    "styles",
+                    "values",
+                ]
+                .contains(&section)
+                {
                     return Err(error("unknown section"));
                 }
                 continue;
@@ -130,34 +141,81 @@ impl Config {
             let saed = &mut config.saed;
             match (section, key) {
                 ("plugin", "enabled") => config.enabled = boolean()?,
-                ("moveset", "yellow_shield_aed") => moveset.yellow_shield_aed = boolean()?,
-                ("moveset", "shield_multiplier") => moveset.shield_multiplier = boolean()?,
-                ("moveset", "gp_recoil") => moveset.gp_recoil = boolean()?,
+                ("moveset", "yellow_shield_aed" | "gp_recoil" | "guard_performance") => {
+                    let index = match key {
+                        "yellow_shield_aed" => 0,
+                        "gp_recoil" => 1,
+                        _ => 2,
+                    };
+                    legacy_switches[index] = Some(boolean()?);
+                }
+                ("values" | "moveset", "shield_multiplier") => {
+                    moveset.shield_multiplier = boolean()?
+                }
                 ("moveset", "j_guard_aed") => moveset.j_guard_aed = boolean()?,
                 ("moveset", "bushi_shield_thrust_aed") => {
-                    moveset.bushi_shield_thrust_aed = boolean()?
+                    // 旧全局启停已取消；缺少新列表时使用none，不自动开启八个风格。
+                    boolean()?;
                 }
-                ("moveset", "aed_camera_shake") => moveset.aed_camera_shake = boolean()?,
+                ("values" | "moveset", "aed_camera_shake") => moveset.aed_camera_shake = boolean()?,
                 ("moveset", "aed_shake_strength") => {
-                    moveset.aed_shake_strength = integer(0, 255)? as u8
+                    // 旧配置只迁移读取；新版本固定 20，菜单和保存不再输出该键。
+                    integer(0, 255)?;
                 }
                 ("saed", "enabled") => saed.enabled = boolean()?,
                 // 原游戏只用 1..4；0 会让冰属性的资源子类型变成不存在的 28。
                 ("saed", "effect_gear") => saed.effect_gear = integer(1, 4)? as u8,
                 ("hitdata", "enabled") => config.hitdata = boolean()?,
-                ("overpowered", "enabled") => config.overpowered = boolean()?,
+                ("aed_followups" | "overpowered", "enabled") => {
+                    // 旧全局键仅验证格式，改为显式选择[styles] aed_followups。
+                    boolean()?;
+                }
+                ("style", "selected") => config.style_selected = boolean()?,
+                ("styles", "yellow_shield_aed") => {
+                    config.styles.yellow_shield_aed = StyleSet::parse(value).map_err(error)?;
+                    explicit_styles |= 1;
+                }
+                ("styles", "gp_recoil") => {
+                    config.styles.gp_recoil = StyleSet::parse(value).map_err(error)?;
+                    explicit_styles |= 2;
+                }
+                ("styles", "guard_performance") => {
+                    config.styles.guard_performance = StyleSet::parse(value).map_err(error)?;
+                    explicit_styles |= 4;
+                }
+                ("styles", "shield_thrust_yellow") => {
+                    config.styles.shield_thrust_yellow = StyleSet::parse(value).map_err(error)?;
+                }
+                ("styles", "guard_recoil_yellow") => {
+                    config.styles.guard_recoil_yellow = StyleSet::parse(value).map_err(error)?;
+                }
+                ("styles", "aed_followups") => {
+                    config.styles.aed_followups = StyleSet::parse(value).map_err(error)?;
+                }
                 _ => return Err(error("unknown setting; check its section and spelling")),
+            }
+        }
+        for (index, set) in [
+            &mut config.styles.yellow_shield_aed,
+            &mut config.styles.gp_recoil,
+            &mut config.styles.guard_performance,
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            if explicit_styles & (1 << index) == 0 && legacy_switches[index] == Some(false) {
+                *set = StyleSet::NONE;
             }
         }
         Ok(config)
     }
 
-    /// 关闭的功能不安装入口钩子，战斗期间无需重复判断总开关。
+    /// HDP是所有盾斧共用的资源；始终注册0x50，战斗功能可以独立关闭。
     pub const fn needs_hitdata(&self) -> bool {
-        self.enabled && (self.hitdata || self.saed.enabled)
+        true
     }
 
-    pub const fn needs_phial(&self) -> bool {
+    pub fn needs_phial(&self) -> bool {
         self.enabled && self.saed.enabled
     }
 }

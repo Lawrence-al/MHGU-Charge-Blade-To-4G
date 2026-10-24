@@ -11,6 +11,11 @@ mod config_io;
 mod debug;
 mod effect;
 mod hooks;
+mod gaxe;
+mod phial;
+#[path = "../../shared/patch.rs"]
+mod patch;
+mod preview;
 mod resource;
 #[path = "../../shared/runtime_hook.rs"]
 mod runtime_hook;

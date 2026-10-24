@@ -2,4 +2,4 @@
 #[path = "config_storage.rs"]
 mod storage;
 #[allow(unused_imports)]
-pub use storage::{Location, MAX_BYTES, MOVESET, PRESENTATION};
+pub use storage::{Location, MAX_BYTES, MOVESET, PRESENTATION, STYLE};

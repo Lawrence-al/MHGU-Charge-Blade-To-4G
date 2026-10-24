@@ -9,7 +9,7 @@ impl Game {
   pub const fn address(self,offset:u32)->u32 {self.0.wrapping_add(offset)}
   pub(crate) unsafe fn function<T:Copy>(self,offset:u32)->T {unsafe{native::function(self.address(offset))}}
 }
-${['player', 'command', 'sound', 'effect', 'shell', 'resource', 'abi'].map(name =>
+${['player', 'command', 'sound', 'effect', 'shell', 'resource', 'abi', 'surface'].map(name =>
   modulePath('game-api/src/' + name + '.rs', name)).join('\n')}
 `;
 };

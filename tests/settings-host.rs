@@ -13,7 +13,7 @@ thread_local! { static STORAGE: RefCell<Storage> = RefCell::new(Storage::default
 #[macro_export] macro_rules! error { ($($arg:tt)*) => {{ let _ = format!($($arg)*); }}; }
 pub mod log { pub mod prelude { pub use crate::error; pub use crate::error as info; pub use crate::error as warn; } }
 pub mod os { pub mod sync {
-    pub use std::sync::OnceLock;
+    pub use std::sync::{LazyLock, OnceLock};
     pub struct Mutex(std::sync::Mutex<()>);
     impl Mutex { pub fn new() -> Self { Self(std::sync::Mutex::new(())) } }
     pub struct ScopedLock<'a>(#[allow(dead_code)] std::sync::MutexGuard<'a, ()>);
@@ -111,7 +111,7 @@ extern "C" fn close(handle: u32) {
 #[derive(Default)]
 struct Controls {
     bools: BTreeMap<String, bool>, floats: BTreeMap<String, f32>, ints: BTreeMap<String, i32>,
-    button: String, stack: Vec<String>, text: Vec<String>,
+    button: String, stack: Vec<String>, text: Vec<String>, drawn: Vec<String>, ranges: BTreeMap<String,(i32,i32)>,
 }
 thread_local! { static CONTROLS: RefCell<Controls> = RefCell::new(Controls::default()); }
 pub mod imgui {
@@ -125,7 +125,7 @@ pub mod imgui {
     pub fn tree_pop() { CONTROLS.with(|s| { s.borrow_mut().stack.pop().unwrap(); }); }
     pub fn checkbox(label: &CStr, value: &mut bool) -> bool {
         CONTROLS.with(|s| {
-            let mut s = s.borrow_mut(); let key = control_key(&s, label);
+            let mut s = s.borrow_mut(); let key = control_key(&s, label); s.drawn.push(key.clone());
             if let Some(v) = s.bools.remove(&key) { *value = v; true } else { false }
         })
     }
@@ -137,9 +137,10 @@ pub mod imgui {
     }
     pub fn input_float(l: &CStr, v: &mut f32, _: f32, _: f32, _: sys::imgui::ImGuiInputTextFlags) -> bool { float(l, v) }
     pub fn slider_float(l: &CStr, v: &mut f32, _: f32, _: f32, _: sys::imgui::ImGuiSliderFlags) -> bool { float(l, v) }
-    pub fn slider_int(l: &CStr, value: &mut i32, _: i32, _: i32, _: sys::imgui::ImGuiSliderFlags) -> bool {
+    pub fn slider_int(l: &CStr, value: &mut i32, min: i32, max: i32, _: sys::imgui::ImGuiSliderFlags) -> bool {
         CONTROLS.with(|s| {
-            let mut s = s.borrow_mut();
+            let mut s = s.borrow_mut(); s.drawn.push(l.to_str().unwrap().to_owned());
+            s.ranges.insert(l.to_str().unwrap().to_owned(),(min,max));
             if let Some(v) = s.ints.remove(l.to_str().unwrap()) { *value = v; true } else { false }
         })
     }
@@ -151,7 +152,7 @@ pub mod imgui {
         })
     }
     pub fn text(text: &str) { CONTROLS.with(|s| s.borrow_mut().text.push(text.to_owned())); }
-    pub fn separator() {} pub fn separator_text(_: &CStr) {} pub fn same_line(_: f32, _: f32) {}
+    pub fn separator() {} pub fn separator_text(l: &CStr) { CONTROLS.with(|s|s.borrow_mut().drawn.push(l.to_str().unwrap().to_owned())); } pub fn same_line(_: f32, _: f32) {}
 }
 fn control_key(c: &Controls, label: &CStr) -> String {
     let name = label.to_str().unwrap();

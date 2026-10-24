@@ -1,6 +1,10 @@
-# 两份 NRO 的功能与默认修改清单
+# NRO 的功能与默认修改清单
 
 本清单对应 2026-10-06 的两 NRO 整合构建。十六进制地址为 GU v1.4.0 的 main 相对偏移；本文数值是 INI 的默认值。Moveset 的开关、范围和依赖见 [配置说明](Configuration.md)。
+
+2026-10-22：4G风格已合并到Moveset，只构建两个NRO。现行六项按0..7配置，黄盾变AED默认3/6，GP后退/防性默认6，后三项none；J防接黄盾独立默认开启。0x44/0x4B本身仍是黄盾前置，需要yellow_shield_aed才转普通AED。公共新动作/HDP常驻，SAED保持全局。菜单及INI按Moveset、SAED、数值排序。详情见[当前配置](Configuration.md)。下文旧产物表及补丁启停说明保留作历史记录。
+
+2026-10-24：此前错误的独立002命中/104砸地功能、菜单及旧资源包已删除。当前Presentation保留GU盾牌逻辑，并可切换到4G剑上的005/103完整序列；4G动作显式关闭贴地覆盖，时长独立。完整29项资源仍可手动预览；详见[005/103接入](2026-10-24_4G盾斧005-103接入.md)。
 
 | 项目 | 产物 | 实现方式 |
 |---|---|---|
@@ -157,9 +161,9 @@ SH 不读取来控制新序列，也不修改本地 SH；旧 `00488F5C/00488F74`
 | `47` | `80→89` |
 | `4D` | `80→99` |
 
-`15/1F/21/44/4A` 的 **HunterArtFlag（record+0x0E）为 0→1**。这不是 `HunterArtGen`（`+0x26`），后者当前没有修改。除上述字段外，当前 `0x00～0x4E` 其余字节与原版一致。
+`15/1F/21/44/4A` 的 **HunterArtFlag（record+0x0E）曾改为0→1**，2026-10-24已由用户关闭为0，并随本次重编部署。它不是 `HunterArtGen`（`+0x26`），后者未改。表中动作值等其它修改仍按asset保留；005命中特效由Presentation真实瓶爆事件独立生成。
 
-`0x4F` 保持原版：`FramesBeforeHitbox=106 / FramesHitboxActive=6 / MotionValue=55`；不采用 asset 的 `0/8/100`。追加 `0x50` 由 `[saed] enabled` 控制，固定为 `0/8/100`。关闭 SAED 时不扩容，仍为 80 条。SAED 的 INI 只有 `enabled` 和 `effect_gear`。
+开启Hitdata后，`0x4F` 恢复原版：`FramesBeforeHitbox=106 / FramesHitboxActive=6 / MotionValue=55`，不采用asset遗留的 `0/8/100`。它仍服务原版无瓶地面超解分支。公共 `0x50` 始终追加，固定为 `0/8/100`；`[saed] enabled`控制地面第三hit是否调用它，关闭SAED也保持81条。空战第三hit使用原0x23。SAED的INI只有 `enabled` 和 `effect_gear`。
 
 ## 5. Overpowered：超模后摇派生
 

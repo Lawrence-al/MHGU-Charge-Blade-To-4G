@@ -1,4 +1,4 @@
-// 一次 HDP 加载：可选内嵌 asset -> 原版 0x4F -> 可选追加 0x50。
+// 一次 HDP 加载：可选内嵌 asset/原版 0x4F，始终扩容并写入公共 0x50。
 #[path = "../../../shared/hitdata_path.rs"]
 mod cb_path;
 pub mod records;
@@ -10,14 +10,12 @@ pub fn accepts(path: &[u8], count: u32, config: &Config) -> bool {
     config.needs_hitdata() && is_cb_path(path) && matches!(count, 0x50 | 0x51)
 }
 
-/// Hitdata 开关复制原 80 条；SAED 开关独立控制扩容及新增第三 hit。
+/// Hitdata 开关控制前80条的覆盖；公共0x50与战斗功能开关、风格无关。
 pub fn apply(bytes: &mut [u8], config: &Config) {
-    if config.hitdata {
+    if config.enabled && config.hitdata {
         records::apply_original(bytes);
     }
-    if config.saed.enabled {
-        records::apply_extra(bytes);
-    }
+    records::apply_extra(bytes);
 }
 
 #[cfg(target_arch = "arm")]
@@ -39,7 +37,7 @@ pub unsafe fn after_load(resource: u32, config: &Config) {
         );
         return;
     }
-    if config.saed.enabled && count == records::ORIGINAL_COUNT as u32 {
+    if count == records::ORIGINAL_COUNT as u32 {
         // 仍使用原 load/unload 的 MtAllocator，保持资源释放归属。
         let allocator = unsafe { ResourceAllocator::get(Game::new(forge::mem::text_addr())) };
         let new_data = unsafe { allocator.allocate(records::EXTENDED_SIZE as u32) };

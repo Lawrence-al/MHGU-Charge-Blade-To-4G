@@ -1,36 +1,92 @@
-# Moveset 配置
+# 配置与 Forge 菜单
 
-从 2026-10-06 起，盾斧项目只有 `cb_presentation_to_4g.nro` 和 `cb_moveset_to_4g.nro` 两个插件。原 SAED、Hitdata、Overpowered 的功能全部在 Moveset 内。项目名和 `cb_` 文件前缀保留。
+现行构建只有 Presentation 和 Moveset 两个 NRO。4G菜单及新动作已合并到Moveset；旧Style NRO需要停用，旧源码保留作历史参考。
 
-两份盾斧 INI 仅在 **MHGU 当前用户存档根目录**读写。缺少文件时启动自动生成 `cb_moveset_to_4g.ini` 和 `cb_presentation_to_4g.ini`，不创建子目录。
+INI唯一位置是MHGU当前用户的存档根目录：`cb_presentation_to_4g.ini`、`cb_moveset_to_4g.ini`。默认模板在项目`conf/`中，首次运行生成。Forge菜单和手动编辑读写同一份文件；功能设置保存后重启应用。原版风格菜单的4G选择即时应用并保存。
 
-仓库默认模板位于 `conf/`：[Moveset](../conf/cb_moveset_to_4g.ini)、[Presentation](../conf/cb_presentation_to_4g.ini)。编译时嵌入 NRO；游戏运行时读写的文件仍在存档根目录。
+## 公共资源始终加载
 
-打开 Forge → Plugin UI → 对应插件，修改后点击 Save INI，重启游戏应用。也可编辑存档根目录的同一个 UTF-8 文件。默认关闭超模，其余功能启用；布尔值填小写 `true`／`false`，支持 BOM、CRLF、注释，最多 8192 字节。写错时保留文件并记录日志，运行使用默认配置。
+不论`[plugin] enabled`、Hitdata或SAED是否启用，都注册盾斧动作`0xAA/0xAB`，并将盾斧HDP从80条扩为81条、追加`0x50`。已有81条时更新末条，不重复扩容。其它武器HDP不处理。
 
-## 总开关与派生
+Hitdata关闭时保留加载文件的前80条；开启且插件总开关开启时才复制内嵌数据，并把`0x4F`恢复原版106/6/55。新增`0x50`固定为延迟0、持续8、动作值100。
 
-| 节 / 字段 | 默认 | 效果 |
+## 按风格编号配置
+
+六个功能只用`[styles]`中的编号集合控制，各自没有第二个功能总开关。只保留0..7八个编号。黄盾变正常AED默认选武士道3和4G6，GP后退/防性默认只选6，新增后三项默认none；`[plugin] enabled`仍是整个插件战斗功能的总开关。
+
+| 编号 | 风格 |
+|---|---|
+| 0 | 公会 |
+| 1 | 强袭 |
+| 2 | 空战 |
+| 3 | 武士道 |
+| 4 | 炼金 |
+| 5 | 勇气 |
+| 6 | 本项目4G；底层使用公会资源 |
+| 7 | 预留风格 |
+
+```ini
+[styles]
+yellow_shield_aed = 3,6
+gp_recoil = 6
+guard_performance = 6
+shield_thrust_yellow = none
+guard_recoil_yellow = none
+aed_followups = none
+```
+
+支持`all`、`none`、`0,2,4,6`、`0-7`、`all,!3`。all只包含这八个编号；8及以上会报配置错误，不增加菜单选项。例如`shield_thrust_yellow = 6,7`只选择4G和预留编号，none关闭该功能。GP后退或防性列表为none时，不安装相应桥接。
+
+Forge菜单上方的“Moveset”提供0–7的Style ID选择器和六项复选框，勾选直接添加当前编号，取消直接移除；J guard是独立全局开关，默认开启。4G选择只在本机公会盾斧上映射为6，远端公会仍按0处理。
+
+菜单及保存后的INI均按“Moveset派生/风格 → SAED → 数值”排列。数值区包含盾补正、固定震动和Hitdata。已有明确填写的列表保留；要应用新的默认值，在Forge菜单点击Defaults、Save INI，再重启游戏。
+
+`0x44/0x4B`是原黄盾前置动作。盾突、J guard或防御后路由仅改变它们的入口，不能独自变成普通AED。还需为同一风格勾选“Yellow shield becomes normal AED”，才把0x44/0x4B转成新增0xAA/0xAB；之后由原盾状态/有瓶判定进入普通大解或超解。
+
+## Moveset功能
+
+| 键 | 默认值 | 行为 |
 |---|---|---|
-| `[plugin] enabled` | true | false 时不安装 Moveset 的任何补丁和钩子；Presentation 独立运行 |
-| `[moveset] yellow_shield_aed` | true | 公会、空战、炼金上黄盾派生改普通大解；炼金仅 GP／蓄力斩后。五处比较值 2→5，两处派生值 0x40→0x1A8；关闭则七处均不写入 |
-| `shield_multiplier` | true | 011DF8B0、011DF8D0 的补正档位统一为 2：红蓝盾 1.2，黄盾 1.0；关闭则两处均不写入 |
-| `gp_recoil` | true | 011DDE74 按原金手指处理 GP 后退；装备风格字节 1/3/5 或玩家动作字节 0x54 时置位 0x20，其它不置位。关闭则保留原无条件置位 |
-| `j_guard_aed` | true | 002EA87C 仅修改武士盾斧 0x81A 第 3 条本次临时命令，X+A 改为动作 0x44；Pre=20、Start=30、End=0 不变。关闭保留盾突派生 |
-| `bushi_shield_thrust_aed` | true | 武士道盾斧盾突后 X+A 改为动作 0x44，仅修改 0x7FA 第 1 条当前命令；Pre=10、Start=34、End=0 保留。与 J 防开关独立，第 7 条及其它风格不改 |
-| `aed_camera_shake` | true | 0048859C 的 `mov r1,#15` 改为下方参数；关闭不改该处 |
-| `aed_shake_strength` | 20 | 0..255；仅 `aed_camera_shake=true` 生效，原 GU 是 15 |
+| `[plugin] enabled` | true | 战斗功能总开关；公共动作、HDP和风格菜单始终注册 |
+| `[styles] yellow_shield_aed` | 3,6 | 当前风格在列表中时，将临时命令0x44/0x4B改为0xAA/0xAB，保留输入条件与窗口；不再写旧七处黄盾补丁 |
+| `[styles] gp_recoil` | 6 | 当前风格在列表中时不ORR 0x20，GP成功退后；其它风格执行原ORR。动作0x54狩技始终保留原置位 |
+| `[styles] guard_performance` | 6 | 当前风格在列表中时，白/红盾有效GP独立减威力10（最低1），红盾使用40/50阈值；否则完整运行原GU回调。黄/蓝盾保留原规则 |
+| `[styles] shield_thrust_yellow` | none | 所选风格盾突链0x7FA第1条X+A接黄盾0x44，保留窗口；强袭原链为空，不新增盾突动作 |
+| `[styles] guard_recoil_yellow` | none | 所选风格小退0x802/中退0x803后追加X+A接黄盾0x4B；原表全部保留，大退不添加 |
+| `[styles] aed_followups` | none | 仅所选风格保留原大解及红盾取消命令，再追加本风格0x7DC第1条起的派生，排除第0条弹刀 |
+| `[moveset] j_guard_aed` | true | J guard X+A接黄盾；仅武士道J防成功链0x81A第3条接0x44，Pre20/Start30/End0保持 |
+| `[hitdata] enabled` | true | 覆盖前80条的独立开关，不控制新增0x50 |
+| `[style] selected` | false | 原版菜单选择4G时自动保存；不作为额外战斗补丁开关 |
+| `[values] shield_multiplier` | true | 红/蓝盾补正档位统一2，即1.2；黄盾档位0，即1.0。对新增风格也生效 |
+| `[values] aed_camera_shake` | true | 大解瓶爆震动从15改为固定20，仅提供启停 |
 
-`j_guard_aed` 和 `bushi_shield_thrust_aed` 共用 `002EA87C` 的一处桥接，不重复安装；两个都关闭时不安装。旧 INI 没有 `bushi_shield_thrust_aed` 时默认开启，在菜单保存会补写该键。菜单选项为 **Adept shield thrust X+A routes to AED**，保存并重启后应用。
+GP判断仍核对`+0x333C=1`、`+0x2510&0x10`和实际GP动画，不依赖后退会取消的`+0x3340&0x20`。普通防御及遗留阶段不会得到额外GP减值。
 
-## 超解功能
+旧INI的三项`[moveset]`布尔总开关只作迁移读取，不再形成运行时第二层判断。已有`[styles]`列表时，以列表为准，与节的顺序无关；缺少列表时，旧false迁为none，旧true使用对应项新默认。保存时不再输出这三个布尔键。
 
-| `[saed]` 字段 | 默认 | 效果／范围 |
-|---|---|---|
-| `enabled` | true | 第三 hit、瓶伤、逐瓶时序／轨迹／贴地及瓶爆特效选档整组启停；开启共 21 处直接改值、HDP 扩容和三个 shell 钩子，关闭全部不安装 |
-| `effect_gear` | 2 | 1..4，等价于 `main+0x011DE830` 的 `mov r9,#数值`，不是 effectId 或瓶数 |
+旧`[moveset] bushi_shield_thrust_aed`、`[aed_followups] enabled`、`[overpowered] enabled`只迁移验证格式，不再作为全局开关；缺少新列表时用none，不自动全开八个风格。需要用新列表明确选择；保存时不再输出这些旧键。
 
-超解只有这两个配置项：
+旧`[moveset] shield_multiplier/aed_camera_shake`仍可读取，保存移到`[values]`。旧`aed_shake_strength`允许读取但数值不再生效，保存时删除；开启震动固定20。
+
+## 小退与中退的追加方式
+
+原公共动作`sub_602C5308`（小退，动画5211）和`sub_602C5488`（中退）调用虚表`+0x63C`，参数分别为0、1。盾斧该槽为main+0x011D4E48，初始化链0x802、0x803。
+
+在InitMoveChain成功后为当前玩家建立表副本，先保留所有原记录，再借用本风格第1条的Active与帧窗口追加末条。小退Start30，中退Start42；Pre继承当前资源。读到该末条时，main+0x002EA87C桥接只改临时命令前24字节为`0x10/0x4B/param0/type8/input0x1B`，保留Pre/Start/End。不改ARC、共享命令或其它原派生，重复初始化不重复追加。
+
+## 菜单文案
+
+| 英文 | 含义 |
+|---|---|
+| Yellow shield becomes normal AED | 黄盾变正常大解 |
+| Use GP recoil in this style | 当前风格使用GP后退 |
+| 4G guard performance for GP and red shield | GP和红盾的防御性能变为4G |
+| Shield thrust X+A to yellow shield | 盾突X+A接黄盾0x44 |
+| Guard recoil (small/medium) X+A to yellow shield | 防御小退/中退后X+A接黄盾0x4B |
+| Additional AED follow-ups | 大解额外派生 |
+| J guard X+A to yellow shield | J防成功后X+A接黄盾0x44，独立全局开关 |
+
+## SAED保持全局开关
 
 ```ini
 [saed]
@@ -38,55 +94,38 @@ enabled = true
 effect_gear = 2
 ```
 
-`enabled=true` 同时执行：
+按用户最后确认，SAED不再按风格拆分。开启时原21处补丁与三个瓶爆钩子同时启用；关闭时用原游戏/SH逻辑，但HDP仍始终81条。
 
-1. 第三下命中：地面 `011DADD4..011DADE8` 调用新增 HDP 0x50，出现延迟 0、持续 8、动作值 100；空中 `011DBDA0..011DBDB4` 调用现有 0x23。`011DB18C/011DBE50` 的后续帧常量 108→109。原动作 0x4F 的调用不改。
-2. 瓶伤：`0048906C..00489078` 四处补丁固定系数 1.35，不再按剩余瓶数递增。精确字面量保留原金手指 `0x3FACCCCC`，不重编码为 `0x3FACCCCD`。
-3. 逐瓶爆炸：钩住初始化 `00488C0C`、更新 `00488DE4`、销毁 `00488BDC`，按真实瓶数逐爆减一；每爆生成特效和攻击判定，计算直线／扇形位置并探测地面 Y。两种瓶爆镜头震动统一为 20/1024，最后一爆后等待 9 再回收。
-4. 瓶爆特效：同时安装 `011DE830/011DE838/011DE83C` 三处选档补丁；有瓶统一使用 `effect_gear`，零瓶仍按原分支返回。
-5. HDP：共用 `00270C18` 加载器从 80 条扩为 81 条，追加独立 0x50。Hitdata 自己的开关只控制原 80 条的内容。
+- 第三hit：地面调用0x50、空中调用0x23；后续帧常量108改109；不改原0x4F调用。
+- 瓶伤：固定原金手指系数1.35，精确字节0x3FACCCCC。
+- 榴弹：首爆等待0、前方270；之后间隔9、每爆前进100。
+- 强属性：首爆等待46、前方300，后续1/2/3/4点扇形；相对时间0/18/20/38/40/42/58/60/62/64。
+- 逐爆探测地面高度，特效与判定共用坐标；支持1..10瓶，最后等待9再回收。
+- `effect_gear`允许1..4，默认2；这是资源档位，不是effectId或真实瓶数。
 
-`enabled=false` 时上面整组不安装，使用原游戏／SH 的超解流程，`effect_gear` 不生效。Hitdata 开关仍独立；开启 Hitdata 会继续复制其数据，但不追加 0x50。删掉的第三 hit、瓶伤、时序及距离配置键不再接受，新模板只保留上述两项。
+完整时序见[SAED](SAED.md)。默认模板已为每个开关列出具体涉及的动作、字段和补丁。
 
-资源档位必须为 1..4：榴弹档位 1/2/3/4 对应资源子类型 3/2/1/0；属性分支按 `1 - 档位 + 元素基值` 选择资源，元素基值为 7/11/15/19/23/27。档位 0 会把冰属性索引算到 28，超过现有资源 0..27，解析器拒绝它。零瓶仍按原分支返回，不创建瓶爆进程。
+## Presentation
 
-## 超解固定时间与位置
+原有音效、GU盾牌闪电和任务时序设置保持原含义。六项4G视觉独立启停：
 
-以下是源码中的固定值，不是 INI 配置项。仅 `saed.enabled=true` 生效。时间是 shell `+0x1C` 的游戏更新帧，距离是游戏坐标单位。首爆当帧锁定人物位置，后续爆点沿初始化时的朝向计算。暂停 delta=0 不计时；一次更新最多爆一瓶。
+```ini
+[effects]
+enabled = true
 
-| 固定参数 | 数值 | 含义 |
-|---|---:|---|
-| 榴弹首爆等待 | 0 | 进程首个有效更新触发 |
-| 榴弹逐爆间隔 | 9 | 旧 SH 总长 21 是 6+6+9 |
-| 榴弹首爆前进 | 270 | 相对首爆当帧人物位置 |
-| 榴弹每爆前进 | 100 | 第二爆起累加 |
-| 强属性首爆等待 | 46 | 从进程初始化累计 |
-| 强属性首爆前进 | 300 | 后续纵向偏移相对此点 |
-| 最后一爆后的回收等待 | 9 | 调用原停止函数 |
+[4g_effects]
+aed_explosion = true
+saed_explosion = true
+phial_attachment = true
+ed_blast = true
+aed_blast = true
+saed_blast = false
+```
 
-榴弹第 i 爆（从 0 编号）：相对首爆时间 `i × 9`，前进 `270 + i × 100`。
+- 前两项只追加独立提取的005/103后段；不再整段替换原GU闪电，不再提供旧的两项完整序列时长。
+- 后四项只改真实瓶附加/瓶爆的资源；地面、水面与元素分别筛选，不改伤害、瓶数及时间表。
+- `saed_blast`因4G107观感较糊默认关闭，回退GU超解瓶爆；其余五项默认开启，103砸地和Moveset超解不受它控制。
+- 菜单顺序为4G特效、GU lightning、Sound；action/burst条目按用途显示在GU或Sound下，仍读写原任务编号。
+- 旧`use_4g_sequences/aed_4g_duration/saed_4g_duration`读取兼容但无效，保存移除。原GU action/burst时长仍保留。
 
-强属性时间表相对首爆为 `0,18,20,38,40,42,58,60,62,64`；纵向相对首爆是 `0,120,120,240,240,240,360,360,360,360`；横向是 `0,80,-80,-120,120,0,-160,160,-160/3,160/3`。前六点来自 4G，后四点为 GU 十瓶扩展。
-
-每爆以先前高度为基准探测 `+300..-2000`；未命中再探测 `+2000..+300`。命中取返回的地面 Y，两次均未命中保留先前高度。
-
-## Hitdata 和超模
-
-| 节 / 字段 | 默认 | 效果 |
-|---|---|---|
-| `[hitdata] enabled` | true | 0x00..0x4E 复制编译时内嵌 asset，0x4F 恢复完整原版记录：延迟 106、持续 6、动作值 55 |
-| `[overpowered] enabled` | false | 保留原大解链全部记录，再追加当前风格 0x7DC 第 1 条起的后摇命令；红盾取消保留，追加时排除弹刀。关闭时不安装 002E9B7C 合并钩子 |
-
-Hitdata 数据本体仍从项目 asset 编入 NRO。要修改整张表，编辑 asset 后重编 Moveset；要启用／关闭这套攻击数据，使用本开关。0x50 固定为延迟 0、持续 8、动作值 100，随 SAED 开关控制。
-
-超模在原派生初始化后建立每玩家独立表，保留链号 `0x7F4/0x7F5/0x839/0x83A`。原记录优先，红盾取消仍为 `Pre=0 / Start=0 / End=28`；追加的后摇命令直接引用当前风格资源，输入、条件和窗口不改。正常斧竖劈的弹刀入口保持原版。详见 [Overpowered](Overpowered.md)。
-
-HDP 与第三 hit 共用一次 `main+0x00270C18` 加载钩子。两者都关闭时，该钩子不安装；仅 Hitdata 开启时仍为 80 条；第三 hit 开启时按原 MtAllocator 扩为 81 条，更新资源 `+0x64/+0x68`，再写内嵌数据。加载失败返回原结果，重载重新执行，已为 81 条的输入不重复扩容。
-
-## 安装和运行确认
-
-当前插件目录中的盾斧文件只放两个 `cb_` NRO；INI 放在上文的游戏存档根目录。旧 `cb_saed_to_4g.nro`、`cb_hitdata_to_4g.nro`、`cb_overpowered.nro` 已整合，不要再安装它们。新的构建产物统一在项目 `dist/` 中。
-
-配置通过游戏的 `savedata:` 挂载读写根目录 INI；成功读取会记录 `MHGU save: /cb_moveset_to_4g.ini: loaded`。补丁原值或缓存刷新检查失败时回滚整组，并停止本次 Moveset 后续钩子安装。
-
-玩家、装备、成功加载的资源缓冲区沿用原函数保证有效的前提，代码不增加空指针兜底。离线验证已覆盖配置、补丁、HDP 和 ARM 桥接；游戏内 INI 读取和战斗表现仍需实际重启测试。
+此前错误的独立002命中/104砸地功能未恢复；002仅作为本轮要求的瓶附加，首爆时立即结束。旧INI的[impacts]两键仅读取兼容，保存移除。005使用真实命中/PSL地面请求，103仅在有瓶超解砸下创建。后段使用独立三资源overlay，29项完整预览包不改，均内嵌NRO。菜单保存到同一存档根目录INI，重启后应用。详见[事件及停止修正](2026-10-24_逆向-005103事件与002首爆停止-report.md)。

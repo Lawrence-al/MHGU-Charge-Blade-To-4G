@@ -61,11 +61,32 @@ class Arm {
       assert.ok(steps < maxSteps, '未返回预定地址');
       const pc = this.r[15], ins = this.read(pc), cond = ins >>> 28;
       this.r[15] = (pc + 4) >>> 0;
-      if (ins === 0xF57FF04F || ins === 0xF57FF06F) continue;
-      if (cond === 0 && !this.flags.z) continue;
-      if (cond === 1 && this.flags.z) continue;
-      assert.ok(cond === 0 || cond === 1 || cond === 14, '不支持的条件');
+      if (ins === 0xF57FF04F || ins === 0xF57FF06F || ins === 0xE320F000) continue;
+      const { n, z, c, v } = this.flags;
+      const passed = [z, !z, c, !c, n, !n, v, !v, c && !z, !c || z,
+        n === v, n !== v, !z && n === v, z || n !== v, true, false];
+      if (!passed[cond]) continue;
       const reg = i => i === 15 ? (pc + 8) >>> 0 : this.r[i];
+      // ARM Operand2 与寄存器寻址共用移位器；逻辑指令取移位后的进位。
+      const shifted = () => {
+        const value = reg(ins & 15), kind = (ins >>> 5) & 3;
+        const byRegister = !!(ins & 16);
+        let amount = byRegister ? reg((ins >>> 8) & 15) & 255 : (ins >>> 7) & 31;
+        if (amount === 0 && byRegister) return { value, carry: this.flags.c };
+        if (kind === 0) return { value: amount < 32 ? (value << amount) >>> 0 : 0,
+          carry: amount === 0 ? this.flags.c : amount <= 32 && !!((value >>> (32 - amount)) & 1) };
+        if (kind === 1) {
+          if (amount === 0) amount = 32;
+          return { value: amount < 32 ? value >>> amount : 0, carry: amount <= 32 && !!((value >>> (amount - 1)) & 1) };
+        }
+        if (kind === 2) {
+          if (amount === 0) amount = 32;
+          return { value: (value >> Math.min(amount, 31)) >>> 0, carry: !!((value >>> (Math.min(amount, 32) - 1)) & 1) };
+        }
+        if (amount === 0) return { value: ((+this.flags.c << 31) | (value >>> 1)) >>> 0, carry: !!(value & 1) };
+        const rotated = rotate(value, amount % 32);
+        return { value: rotated, carry: !!(rotated >>> 31) };
+      };
       const sd = ((ins >>> 12) & 15) * 2 + ((ins >>> 22) & 1);
       const sn = ((ins >>> 16) & 15) * 2 + ((ins >>> 7) & 1);
       const sm = (ins & 15) * 2 + ((ins >>> 5) & 1);
@@ -145,28 +166,49 @@ class Arm {
       } else if (((ins >>> 24) & 15) === 15) {
         this.svcs.push({ number: ins & 0xFFFFFF, regs: Array.from(this.r.slice(0, 5)) });
         this.r[0] = this.svcResult;
+      } else if ((ins & 0x0E000090) === 0x00000090 && (ins & 0x60)) {
+        const rn = (ins >>> 16) & 15, rd = (ins >>> 12) & 15;
+        const offset = ins & (1 << 22) ? ((ins >>> 4) & 0xF0) | (ins & 15) : reg(ins & 15);
+        const adjusted = (reg(rn) + (ins & (1 << 23) ? offset : -offset)) >>> 0;
+        const pre = !!(ins & (1 << 24)), addr = pre ? adjusted : reg(rn);
+        const kind = (ins >>> 5) & 3;
+        if (ins & (1 << 20)) {
+          const value = this.read(addr, true) | (kind === 2 ? 0 : this.read(addr + 1, true) << 8);
+          this.r[rd] = kind === 1 ? value : kind === 2 ? (value << 24) >> 24 : (value << 16) >> 16;
+        } else {
+          assert.equal(kind, 1, '只支持 STRH');
+          this.bytes.set(addr, reg(rd) & 255); this.bytes.set(addr + 1, (reg(rd) >>> 8) & 255);
+        }
+        if (!pre || ins & (1 << 21)) this.r[rn] = adjusted;
       } else if (((ins >>> 26) & 3) === 1) {
         const rn = (ins >>> 16) & 15, rd = (ins >>> 12) & 15;
-        assert.ok(ins & (1 << 24));
-        const offset = ins & (1 << 25) ? reg(ins & 15) : ins & 0xFFF;
-        const addr = (reg(rn) + (ins & (1 << 23) ? offset : -offset)) >>> 0;
+        const offset = ins & (1 << 25) ? shifted().value : ins & 0xFFF;
+        const adjusted = (reg(rn) + (ins & (1 << 23) ? offset : -offset)) >>> 0;
+        const pre = !!(ins & (1 << 24)), addr = pre ? adjusted : reg(rn);
         if (ins & (1 << 20)) this.r[rd] = this.read(addr, !!(ins & (1 << 22)));
         else if (ins & (1 << 22)) this.bytes.set(addr, reg(rd) & 255);
         else this.words.set(addr, reg(rd));
-        if (ins & (1 << 21)) this.r[rn] = addr;
+        if (!pre || ins & (1 << 21)) this.r[rn] = adjusted;
       } else if (((ins >>> 26) & 3) === 0) {
         const op = (ins >>> 21) & 15, rn = (ins >>> 16) & 15, rd = (ins >>> 12) & 15;
-        const value = ins & (1 << 25) ? rotate(ins & 255, ((ins >>> 8) & 15) * 2) : reg(ins & 15), a = reg(rn);
+        const shift = ((ins >>> 8) & 15) * 2;
+        const operand = ins & (1 << 25) ? { value: rotate(ins & 255, shift),
+          carry: shift ? !!(rotate(ins & 255, shift) >>> 31) : this.flags.c } : shifted();
+        const value = operand.value, a = reg(rn);
         if (op === 10 || op === 2) {
           const result = (a - value) >>> 0;
           if (op === 10 || (ins & (1 << 20))) this.flags = { n: !!(result >>> 31), z: result === 0, c: a >= value, v: !!(((a ^ value) & (a ^ result)) >>> 31) };
           if (op === 2) this.r[rd] = result;
-        } else if (op === 0) {
-          assert.equal(ins & (1 << 20), 0, 'ANDS flag update is not implemented');
-          this.r[rd] = a & value;
+        } else if (op === 0 || op === 8) {
+          const result = (a & value) >>> 0;
+          if (op === 0) this.r[rd] = result;
+          if (op === 8 || ins & (1 << 20)) this.flags = {
+            n: !!(result >>> 31), z: result === 0, c: operand.carry, v: this.flags.v,
+          };
         } else if (op === 12) this.r[rd] = a | value;
         else if (op === 4) this.r[rd] = a + value;
         else if (op === 13) this.r[rd] = value;
+        else if (op === 15) this.r[rd] = ~value;
         else throw Error('不支持的 ALU 指令 0x' + ins.toString(16));
       } else throw Error('不支持的指令 0x' + ins.toString(16));
     }

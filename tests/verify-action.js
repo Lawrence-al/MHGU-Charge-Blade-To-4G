@@ -60,6 +60,9 @@ mod native {
   pub unsafe fn function<T:Copy>(offset:u32)->T {assert_eq!(offset,0x004F0BE8);let p=play as *const();unsafe{core::mem::transmute_copy(&p)}}
 }
 fn take()->Vec<Event>{EVENTS.with(|v|std::mem::take(&mut*v.borrow_mut()))}
+fn four_g(bits:u32)->config::FourGEffects {config::FourGEffects{
+  aed_explosion:bits&1!=0,saed_explosion:bits&2!=0,phial_attachment:bits&4!=0,
+  ed_blast:bits&8!=0,aed_blast:bits&16!=0,saed_blast:bits&32!=0}}
 fn main() {
   use player::ChargeBladePlayer;
   state::STATE.initialize(0);
@@ -105,6 +108,38 @@ fn main() {
   assert!(take().is_empty());
   unsafe {memory::write_u32(actor+0x500,14.0f32.to_bits());action::on_phial_action_frame(player,1,1);}
   assert_eq!(take(),vec![Event::Se(actor,0x4A,2,0,4,0)]);
-  println!("PASS: {cases} new/old actual action-runner calls match; configured frame/duration, independent sound/effect/task switches and single execution verified");
+  assert_eq!(cases,7920);
+  // 六项4G开关的全部组合都不进入GU执行器的资源/音效/时长选择。
+  let mut independent=0;
+  for bits in 0..64 {for element in [0,1] {for variant in [1,2,7,9] {
+    unsafe{memory::write_u32(actor+0x10000+0x356,element);memory::write_u8(actor+6,1);}
+    let mut c=config::Config::DEFAULT;c.four_g=four_g(bits);config_file::set(c);
+    for burst in [false,true] {
+      for (stage,frame) in [(0,0f32),(1,1.),(1,10.),(2,26.),(1,30.),(1,40.),(2,50.),(1,62.),(1,66.),(1,108.),(1,109.),(1,120.)] {
+        unsafe{memory::write_u32(actor+0x500,frame.to_bits());
+          if burst{old_action::on_burst_action_frame(actor,variant,stage)}else{old_action::on_phial_action_frame(actor,variant,stage)}};
+        let expected=take();
+        unsafe{if burst{action::on_burst_action_frame(player,variant,stage)}else{action::on_phial_action_frame(player,variant,stage)}};
+        assert_eq!(take(),expected,"4G flags={bits} element={element} variant={variant} burst={burst} frame={frame}");
+        independent+=1;
+      }
+    }
+  }}}
+  for element in [0,1] {for bits in 0..64 {for variant in [1,2,7,9] {
+    unsafe{memory::write_u32(actor+0x10000+0x356,element);memory::write_u8(actor+6,1);}
+    let mut c=config::Config::DEFAULT;c.sounds=false;c.four_g=four_g(bits);
+    c.action[0].duration_frames=17.;c.action[1].duration_frames=19.;
+    c.burst[3].duration_frames=23.;c.burst[4].duration_frames=27.;
+    config_file::set(c);
+    unsafe{action::on_phial_action_frame(player,variant,0);memory::write_u32(actor+0x500,1f32.to_bits());action::on_phial_action_frame(player,variant,1);}
+    let saed=variant==2||variant==9;let id=if saed{0x262}else{0x258}+element as u16;
+    let duration=if saed{19.}else{17.};
+    assert_eq!(take(),vec![Event::Effect(actor,id,duration)]);
+    for (v,frame,duration) in [(2,26f32,23f32),(1,50.,27.)] {
+      unsafe{action::on_burst_action_frame(player,v,0);memory::write_u32(actor+0x500,frame.to_bits());action::on_burst_action_frame(player,v,2);}
+      assert_eq!(take(),vec![Event::Effect(actor,0x258+element as u16,duration)]);
+    }
+  }}}
+  println!("PASS: {cases} original GU action-runner cases plus {independent} six-flag independence cases match; GU IDs, sounds and custom main/preparation durations retained for all64 combinations");
 }
 `);

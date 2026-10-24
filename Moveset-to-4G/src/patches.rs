@@ -16,8 +16,13 @@ pub unsafe fn selected(_game_base: u32, config: &Config) -> Plan {
         words: Vec::new(),
         branches: Vec::new(),
     };
+    // 资源/动作注册与风格菜单常驻，功能总开关不影响这些公共内容。
+    crate::style::collect(&mut plan.branches);
     if config.enabled {
-        unsafe { crate::moveset::collect(&config.moveset, &mut plan.words, &mut plan.branches) };
+        unsafe { crate::moveset::collect(config, &mut plan.words, &mut plan.branches) };
+        if !config.styles.guard_performance.is_empty() {
+            crate::guard::collect(&mut plan.branches);
+        }
         crate::saed::patches::collect(&config.saed, &mut plan.words);
     }
     plan

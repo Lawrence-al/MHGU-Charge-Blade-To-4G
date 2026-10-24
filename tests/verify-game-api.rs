@@ -27,6 +27,30 @@ fn main() {
             assert_eq!(actual, expected);
         }
     }
+    for mask in [1u32, 2, 0xFFFF_FFFF] {
+        let mut params = EffectCreateParams::zeroed();
+        params.set_local_position([30.0, 0.0, 250.0]);
+        params.set_rotation([0.0; 3]);
+        params.set_scale([1.0; 3]);
+        params.set_unit_mask(mask);
+        let bytes = unsafe { core::slice::from_raw_parts(&params as *const _ as *const u8, 0xE0) };
+        let word = |offset| u32::from_le_bytes(bytes[offset..offset+4].try_into().unwrap());
+        assert_eq!(word(0x14), 3 | (1 << 18) | (1 << 30));
+        assert_eq!(word(0x68), mask);
+        for (index, value) in [30.0f32, 0.0, 250.0, 0.0].into_iter().enumerate() {
+            assert_eq!(word(0x20 + index * 4), value.to_bits());
+        }
+        for index in 0..3 { assert_eq!(word(0x40 + index * 4), 1.0f32.to_bits()); }
+    }
     println!("PASS: shared ARM32 effect layout/alignment and named setters match all old mask/parent/bone writes byte-for-byte");
+    for enabled in [false, true] {
+        let mut params = EffectCreateParams::zeroed();
+        params.set_ground_snap(enabled);
+        let bytes = unsafe { core::slice::from_raw_parts(&params as *const _ as *const u8, 0xE0) };
+        assert_eq!(u32::from_le_bytes(bytes[0x14..0x18].try_into().unwrap()), 1 << 21);
+        assert_eq!(bytes[0x72], u8::from(enabled));
+        assert_eq!(bytes[0x71], 0);
+        assert_eq!(bytes[0x73], 0);
+    }
 }
 

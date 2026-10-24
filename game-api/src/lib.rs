@@ -10,6 +10,7 @@ pub mod player;
 pub mod resource;
 pub mod shell;
 pub mod sound;
+pub mod surface;
 
 /// main 的运行时基址；所有函数偏移均为 IDA 地址减 0x60000000。
 #[repr(transparent)]
@@ -30,5 +31,12 @@ impl Game {
     #[inline]
     pub(crate) unsafe fn function<T: Copy>(self, offset: u32) -> T {
         unsafe { core::mem::transmute_copy(&self.address(offset)) }
+    }
+
+    /// 当前用户的玩家对象；菜单及任务内均通过原管理器取得，不缓存跨场景指针。
+    pub unsafe fn local_player(self) -> player::ChargeBladePlayer {
+        let get: unsafe extern "C" fn(u32) -> u32 = unsafe { self.function(0x00276278) };
+        let manager = unsafe { memory::read_u32(self.address(0x01885B58)) };
+        player::ChargeBladePlayer::from_address(unsafe { get(manager) })
     }
 }

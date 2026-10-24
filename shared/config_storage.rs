@@ -34,6 +34,7 @@ location!(
     "cb_moveset_to_4g.ini",
     "../conf/cb_moveset_to_4g.ini"
 );
+location!(STYLE, "cb_style_to_4g.ini", "../conf/cb_style_to_4g.ini");
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ReadError {
@@ -108,7 +109,8 @@ impl Location {
             if self.defaults.len() > bytes.len() {
                 return Err(ReadError::TooLarge);
             }
-            self.write_mounted(self.defaults).map_err(|_| ReadError::Io)?;
+            self.write_mounted(self.defaults)
+                .map_err(|_| ReadError::Io)?;
             bytes[..self.defaults.len()].copy_from_slice(self.defaults.as_bytes());
             info!("{}: generated default INI", self.display);
             return Ok(core::str::from_utf8(&bytes[..self.defaults.len()]).unwrap());
@@ -152,7 +154,8 @@ impl Location {
     }
 
     pub fn save(&self, text: &str) -> Result<(), &'static str> {
-        let _mount = SaveMount::open().map_err(|_| "Could not mount MHGU save data. See Forge log.")?;
+        let _mount =
+            SaveMount::open().map_err(|_| "Could not mount MHGU save data. See Forge log.")?;
         self.write_mounted(text)
     }
 
@@ -177,9 +180,8 @@ impl Location {
         }
         let mut code = unsafe { set_file_size(file, text.len() as i64) };
         if code == 0 {
-            code = unsafe {
-                write_file(file, 0, text.as_ptr().cast(), text.len(), &WriteOption(1))
-            };
+            code =
+                unsafe { write_file(file, 0, text.as_ptr().cast(), text.len(), &WriteOption(1)) };
         }
         unsafe { close_file(file) };
         if code != 0 {

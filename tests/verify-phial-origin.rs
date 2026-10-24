@@ -12,6 +12,7 @@ impl Game {
 #[path="../game-api/src/command.rs"] pub mod command;
 #[path="../game-api/src/sound.rs"] pub mod sound;
 #[path="../game-api/src/effect.rs"] pub mod effect;
+#[path="../game-api/src/resource.rs"] pub mod resource;
 #[path="../game-api/src/shell.rs"] pub mod shell;
 mod memory {
     pub use super::native::{read_u8,read_u32,read_f32,write_u8,write_u32};
@@ -23,6 +24,7 @@ mod memory {
 }
 mod abi {
     pub unsafe fn trig_call(offset:u32,angle:u32)->u32 {unsafe{super::native::trig_call(offset,angle)}}
+    pub unsafe fn frame_event(_:u32,_:u32,_:u32)->u32 {panic!("origin检查不调用动作帧入口")}
     pub unsafe fn float_call8(offset:u32,args:*const[u32;8])->u32 {unsafe{super::native::float_call8(offset,&*args)}}
 }
 

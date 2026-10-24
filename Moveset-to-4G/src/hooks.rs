@@ -1,4 +1,4 @@
-// 唯一的入口钩子安装点；关闭功能时不挂钩，HDP 合并为一次原函数调用。
+// 唯一入口钩子安装点：公共动作/HDP常驻；战斗功能按开关安装。
 use crate::{config::Config, config_file, hitdata, overpowered, saed::phial};
 use cb_game::{Game, player::ChargeBladePlayer, shell::SaedShell};
 
@@ -44,7 +44,7 @@ fn hook_saed_shell_destruct(shell: u32) -> u32, |original| {
 }
 }
 
-// 原初始化完成后，仅为大解的原链追加后摇命令；原返回寄存器也保留。
+// 原初始化完成后，按风格为大解/小退/中退追加命令；原返回寄存器也保留。
 crate::cb_hook! { 0x002E9B7C,
 fn hook_move_chain_init(player: u32, chain: u32, start_frame: i32) -> u32, |original| {
     let result = unsafe { original(player, chain, start_frame) };
@@ -54,7 +54,11 @@ fn hook_move_chain_init(player: u32, chain: u32, start_frame: i32) -> u32, |orig
 }
 
 pub fn enable(game_base: u32, config: &Config) {
-    if config.overpowered {
+    crate::style::enable(game_base);
+    if config.enabled
+        && (!config.styles.aed_followups.is_empty()
+            || !config.styles.guard_recoil_yellow.is_empty())
+    {
         overpowered::init();
         forge::install_hook!(game_base, hook_move_chain_init);
     }
@@ -68,20 +72,16 @@ pub fn enable(game_base: u32, config: &Config) {
         forge::install_hook!(game_base, hook_saed_shell_destruct);
     }
     forge::log::prelude::error!(
-        "moveset-to-4g: Hitdata={}, SAED={}, effect_gear={}, overpowered={}",
+        "moveset-to-4g: Hitdata={}, SAED={}, effect_gear={}",
         config.hitdata,
         config.saed.enabled,
-        config.saed.effect_gear,
-        config.overpowered
+        config.saed.effect_gear
     );
     forge::log::prelude::error!(
-        "moveset-to-4g: yellow_AED={}, shield_multiplier={}, GP_recoil={}, J_guard_AED={}, Bushi_shield_thrust_AED={}, AED_shake={}/{}",
-        config.moveset.yellow_shield_aed,
+        "moveset-to-4g: styles={:?}, shield_multiplier={}, J_guard_yellow={}, AED_shake={}",
+        config.styles,
         config.moveset.shield_multiplier,
-        config.moveset.gp_recoil,
         config.moveset.j_guard_aed,
-        config.moveset.bushi_shield_thrust_aed,
-        config.moveset.aed_camera_shake,
-        config.moveset.aed_shake_strength
+        config.moveset.aed_camera_shake
     );
 }

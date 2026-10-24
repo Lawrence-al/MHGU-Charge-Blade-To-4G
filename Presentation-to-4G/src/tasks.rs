@@ -23,13 +23,13 @@ pub enum TaskAction {
         /// 发声挂点索引（mss 0x66 第 3 个字段）
         attach_index: i32,
     },
-    /// 创建 UNIQUE 特效，父对象使用当前玩家的盾牌、骨骼使用 0
+    /// 原GU路径创建盾牌UNIQUE特效；可选4G路径在执行器中另行分发。
     CreateShieldEffect {
-        /// 榴弹瓶使用的特效 ID
+        /// 榴弹瓶的GU请求ID。
         effect_id: u16,
-        /// 强属性瓶使用的特效 ID
+        /// 强属性瓶的GU请求ID。
         element_effect_id: u16,
-        /// 从创建起累计的特效更新帧数，不因动作切换或命中提前停止
+        /// 原GU持续时间；4G本体另用独立配置，不覆盖这里的原数值。
         duration_frames: f32,
     },
     // 以后扩展示例（现在还没用）：
@@ -81,7 +81,7 @@ pub const ACTION_TASKS: &[ActionTask] = &[
     },
     */
     // ---- 后续帧（actionState == 1）----
-    // 大姐：第 1 帧创建盾牌闪电，持续 30 帧。
+    // 大姐：第1帧创建原GU盾牌闪电，持续30帧。
     ActionTask {
         action_state: 1,
         variant_mask: MASK_1_7,
@@ -92,7 +92,7 @@ pub const ACTION_TASKS: &[ActionTask] = &[
             duration_frames: 30.0,
         },
     },
-    // variant 2|9：第 1 帧创建盾牌闪电，持续 30 帧。
+    // variant2|9：第1帧创建原GU盾牌特效，持续30帧。
     ActionTask {
         action_state: 1,
         variant_mask: MASK_2_9,

@@ -28,7 +28,7 @@ function hostBridge(file, name) {
   const source = fs.readFileSync(path.join(root, file), 'utf8')
     .replace(/use core::arch::\{[^;]+;\s*/g, '')
     .replace(/global_asm!\([^;]+;\s*/g, '')
-    .replace(/#\[unsafe\(naked\)\]\s*unsafe extern "C" fn (\w+)\(\) \{[\s\S]*?\n\}/g, 'unsafe extern "C" fn $1() {}');
+    .replace(/#\[unsafe\(naked\)\]\s*unsafe extern "C" fn (\w+)\(([^)]*)\) \{[\s\S]*?\n\}/g, 'unsafe extern "C" fn $1($2) {}');
   if (source.includes('naked_asm!') || source.includes('global_asm!')) throw Error('ARM 适配不完整');
   const output = path.join(dir, name + '.rs');
   fs.writeFileSync(output, source);

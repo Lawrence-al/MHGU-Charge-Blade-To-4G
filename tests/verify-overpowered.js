@@ -10,7 +10,7 @@ const helper=plugin.symbol('overpowered16after_chain_init');
 let cases=0;
 for(const base of [0x70000000,0x4C000000]){
   const original=0x61001000,end=0x21000000;
-  for(const player of [0x22000000,0x23000000])for(const chain of [0x7F4,0x7F5,0x839,0x83A,0x7DC,0x81A,0]){
+  for(const player of [0x22000000,0x23000000])for(const chain of [0x7F4,0x7F5,0x839,0x83A,0x802,0x803,0x7DC,0x81A,0]){
     for(const frame of [-9,0,2,3000])for(const result of [0,1,0x12345678]){
       const regs=Array.from({length:16},(_,i)=>(0x31000000+i*0x10101)>>>0);
       regs[0]=player;regs[1]=chain;regs[2]=frame>>>0;regs[13]=0x24001000;regs[14]=end;
@@ -57,20 +57,24 @@ fn event(v:&'static str){EVENTS.with(|e|e.borrow_mut().push(v));}
 pub mod log{pub mod prelude{pub use crate::error;}}
 mod overpowered{pub fn init(){crate::event("overpowered::init");}}
 mod phial{pub fn init(){crate::event("phial::init");}}
+mod style{pub fn enable(_:u32){crate::event("style::enable");}}
 ${enable}
 fn main(){
- for bits in 0..512{
+ for bits in 0..1024{
   let mut c=Config::DEFAULT;
-  c.enabled=bits&1!=0;c.overpowered=bits&2!=0;c.hitdata=bits&4!=0;c.saed.enabled=bits&8!=0;
-  c.moveset.yellow_shield_aed=bits&16!=0;c.moveset.gp_recoil=bits&32!=0;c.moveset.j_guard_aed=bits&64!=0;
-  c.moveset.bushi_shield_thrust_aed=bits&128!=0;c.moveset.aed_camera_shake=bits&256!=0;
-  EVENTS.with(|e|e.borrow_mut().clear());if c.enabled{enable(0x60000000,&c);}
-  let mut expected=Vec::new();
-  if c.enabled&&c.overpowered{expected.extend(["overpowered::init","hook_move_chain_init"]);}
+  let set=|on|if on{config::StyleSet::FOUR_G}else{config::StyleSet::NONE};
+  c.enabled=bits&1!=0;c.styles.aed_followups=set(bits&2!=0);c.hitdata=bits&4!=0;c.saed.enabled=bits&8!=0;
+  c.styles.yellow_shield_aed=if bits&16!=0{config::StyleSet::FOUR_G}else{config::StyleSet::NONE};
+  c.styles.gp_recoil=if bits&32!=0{config::StyleSet::FOUR_G}else{config::StyleSet::NONE};c.moveset.j_guard_aed=bits&64!=0;
+  c.styles.shield_thrust_yellow=set(bits&128!=0);c.moveset.aed_camera_shake=bits&256!=0;
+  c.styles.guard_recoil_yellow=set(bits&512!=0);
+  EVENTS.with(|e|e.borrow_mut().clear());enable(0x60000000,&c);
+  let mut expected=vec!["style::enable"];
+  if c.enabled&&(!c.styles.aed_followups.is_empty()||!c.styles.guard_recoil_yellow.is_empty()){expected.extend(["overpowered::init","hook_move_chain_init"]);}
   if c.needs_hitdata(){expected.push("hook_hitdata_load");}
   if c.needs_phial(){expected.extend(["phial::init","hook_saed_shell_init","hook_saed_shell_update","hook_saed_shell_destruct"]);}
   EVENTS.with(|e|assert_eq!(*e.borrow(),expected,"bits={bits}"));
  }
- println!("PASS: 512 actual hook-selection combinations; Overpowered installs one InitMoveChain hook, disabled groups install none");
+ println!("PASS: 1024 actual hook-selection combinations; AED/guard lists share one InitMoveChain hook, empty groups install none");
 }
 `);

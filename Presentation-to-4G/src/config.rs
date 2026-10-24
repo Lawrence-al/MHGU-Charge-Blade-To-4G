@@ -33,6 +33,28 @@ const fn task_defaults<const N: usize>(tasks: &[ActionTask]) -> [TaskSettings; N
 
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
+pub struct FourGEffects {
+    pub aed_explosion: bool,
+    pub saed_explosion: bool,
+    pub phial_attachment: bool,
+    pub ed_blast: bool,
+    pub aed_blast: bool,
+    pub saed_blast: bool,
+}
+
+impl FourGEffects {
+    pub const DEFAULT: Self = Self {
+        aed_explosion: true,
+        saed_explosion: true,
+        phial_attachment: true,
+        ed_blast: true,
+        aed_blast: true,
+        saed_blast: false,
+    };
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Config {
     pub enabled: bool,
     pub sounds: bool,
@@ -44,6 +66,8 @@ pub struct Config {
     pub shield_thrust_duration: f32,
     pub action: [TaskSettings; ACTION_TASKS.len()],
     pub burst: [TaskSettings; BURST_ACTION_TASKS.len()],
+    // 保留既有任务数组和盾突持续时间的布局。
+    pub four_g: FourGEffects,
 }
 
 #[derive(Debug, PartialEq)]
@@ -64,6 +88,7 @@ impl Config {
         shield_thrust_duration: 30.0,
         action: task_defaults(ACTION_TASKS),
         burst: task_defaults(BURST_ACTION_TASKS),
+        four_g: FourGEffects::DEFAULT,
     };
 
     pub fn parse(text: &str) -> Result<Self, ConfigError> {
@@ -83,7 +108,7 @@ impl Config {
                     .strip_prefix('[')
                     .and_then(|s| s.strip_suffix(']'))
                     .ok_or_else(|| error("expected [section]"))?;
-                if !["plugin", "sounds", "effects"].contains(&section)
+                if !["plugin", "sounds", "effects", "4g_effects", "impacts"].contains(&section)
                     && task_index(section, "action.", ACTION_TASKS.len()).is_none()
                     && task_index(section, "burst.", BURST_ACTION_TASKS.len()).is_none()
                 {
@@ -114,10 +139,21 @@ impl Config {
                 ("sounds", "patch_pts") => config.patch_pts = boolean()?,
                 ("sounds", "volume_4a") => config.volume_4a = number(-96.0, 12.0)?,
                 ("effects", "enabled") => config.effects = boolean()?,
+                // 旧完整序列替换已撤去；读取旧键不再改变GU闪电，保存时移除。
+                ("effects", "use_4g_sequences") => { let _ = boolean()?; }
+                ("effects", "aed_4g_duration" | "saed_4g_duration") => { let _ = number(0.0, 10000.0)?; }
+                ("4g_effects", "aed_explosion") => config.four_g.aed_explosion = boolean()?,
+                ("4g_effects", "saed_explosion") => config.four_g.saed_explosion = boolean()?,
+                ("4g_effects", "phial_attachment") => config.four_g.phial_attachment = boolean()?,
+                ("4g_effects", "ed_blast") => config.four_g.ed_blast = boolean()?,
+                ("4g_effects", "aed_blast") => config.four_g.aed_blast = boolean()?,
+                ("4g_effects", "saed_blast") => config.four_g.saed_blast = boolean()?,
                 ("effects", "shield_thrust") => config.shield_thrust = boolean()?,
                 ("effects", "shield_thrust_duration") => {
                     config.shield_thrust_duration = number(0.1, 10000.0)?
                 }
+                // 兼容旧INI，仅忽略已删除的两项；保存时不再写回，不再安装任何旧钩子。
+                ("impacts", "aed_hit_4g" | "saed_ground_4g") => { let _ = boolean()?; }
                 _ => {
                     let (setting, task) = if let Some(i) =
                         task_index(section, "action.", ACTION_TASKS.len())
@@ -158,6 +194,12 @@ impl Config {
                     ("sounds", "patch_pts") => Bool(self.patch_pts),
                     ("sounds", "volume_4a") => Float(self.volume_4a),
                     ("effects", "enabled") => Bool(self.effects),
+                    ("4g_effects", "aed_explosion") => Bool(self.four_g.aed_explosion),
+                    ("4g_effects", "saed_explosion") => Bool(self.four_g.saed_explosion),
+                    ("4g_effects", "phial_attachment") => Bool(self.four_g.phial_attachment),
+                    ("4g_effects", "ed_blast") => Bool(self.four_g.ed_blast),
+                    ("4g_effects", "aed_blast") => Bool(self.four_g.aed_blast),
+                    ("4g_effects", "saed_blast") => Bool(self.four_g.saed_blast),
                     ("effects", "shield_thrust") => Bool(self.shield_thrust),
                     ("effects", "shield_thrust_duration") => Float(self.shield_thrust_duration),
                     _ => {
