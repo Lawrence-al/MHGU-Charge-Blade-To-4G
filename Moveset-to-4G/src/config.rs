@@ -20,6 +20,7 @@ pub struct MovesetConfig {
     pub shield_multiplier: bool,
     pub j_guard_aed: bool,
     pub aed_camera_shake: bool,
+    pub aed_recovery_frames: u16,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -47,6 +48,7 @@ impl Config {
                     ("values", "shield_multiplier") => Bool(self.moveset.shield_multiplier),
                     ("moveset", "j_guard_aed") => Bool(self.moveset.j_guard_aed),
                     ("values", "aed_camera_shake") => Bool(self.moveset.aed_camera_shake),
+                    ("values", "aed_recovery_frames") => Integer(self.moveset.aed_recovery_frames.into()),
                     ("saed", "enabled") => Bool(self.saed.enabled),
                     ("saed", "effect_gear") => Integer(self.saed.effect_gear.into()),
                     ("hitdata", "enabled") => Bool(self.hitdata),
@@ -57,6 +59,7 @@ impl Config {
                     ("styles", "shield_thrust_yellow") => IdSet(self.styles.shield_thrust_yellow.0),
                     ("styles", "guard_recoil_yellow") => IdSet(self.styles.guard_recoil_yellow.0),
                     ("styles", "aed_followups") => IdSet(self.styles.aed_followups.0),
+                    ("styles", "aed_recovery") => IdSet(self.styles.aed_recovery.0),
                     _ => return None,
                 })
             },
@@ -70,6 +73,7 @@ impl Config {
             shield_multiplier: true,
             j_guard_aed: true,
             aed_camera_shake: true,
+            aed_recovery_frames: 20,
         },
         saed: SaedConfig {
             enabled: true,
@@ -158,6 +162,7 @@ impl Config {
                     boolean()?;
                 }
                 ("values" | "moveset", "aed_camera_shake") => moveset.aed_camera_shake = boolean()?,
+                ("values", "aed_recovery_frames") => moveset.aed_recovery_frames = integer(3, 120)?,
                 ("moveset", "aed_shake_strength") => {
                     // 旧配置只迁移读取；新版本固定 20，菜单和保存不再输出该键。
                     integer(0, 255)?;
@@ -191,6 +196,9 @@ impl Config {
                 }
                 ("styles", "aed_followups") => {
                     config.styles.aed_followups = StyleSet::parse(value).map_err(error)?;
+                }
+                ("styles", "aed_recovery") => {
+                    config.styles.aed_recovery = StyleSet::parse(value).map_err(error)?;
                 }
                 _ => return Err(error("unknown setting; check its section and spelling")),
             }

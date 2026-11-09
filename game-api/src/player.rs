@@ -79,6 +79,11 @@ impl ChargeBladePlayer {
         unsafe { memory::read_u8(self.0 + 6) != 0 }
     }
 
+    /// 剑攻击累计的能量，不是已装入的瓶数；黄色30、红色46、过热72。
+    pub unsafe fn phial_energy(self) -> i32 {
+        unsafe { memory::read_u32(self.0 + 0x2780) as i32 }
+    }
+
     /// CreateShell03读此真实瓶数，必须在原函数发瓶/消耗之前捕获。
     pub unsafe fn phial_count(self) -> u32 {
         unsafe { memory::read_u32(self.0 + 0x3354) }

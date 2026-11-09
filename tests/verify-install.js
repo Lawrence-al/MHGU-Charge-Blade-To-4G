@@ -1,4 +1,4 @@
-// 实际配置解析、2048组选项选择与完整补丁事务／失败恢复。
+// 实际配置解析、4096组选项选择、标准 Hook 安装与失败恢复。
 const {fs, path, root, modulePath, hostBridge, run} = require('./host');
 const fixtures = require('./fixtures');
 const shared = fs.readFileSync(path.join(root, 'shared/patch.rs'), 'utf8');
@@ -6,6 +6,14 @@ const types = shared.slice(shared.indexOf('pub type WordPatch'), shared.indexOf(
 const install = shared.slice(shared.indexOf('pub unsafe fn install'))
   .replace(/ptr::read_volatile\((.+?) as \*const u32\)/g, 'read_main($1)');
 const rows = list => list.map(([site, value]) => '(' + site + ',' + value + ')').join(',');
+let numeric = fs.readFileSync(path.join(root,'Moveset-to-4G/src/instruction_hooks.rs'),'utf8')
+  .replace(/use core::arch::\{[^;]+;\s*/g,'')
+  .replace(/global_asm!\([^;]+;\s*/g,'')
+  .replace(/macro_rules! bridge \{[\s\S]*?\n\}/,'')
+  .replace(/^bridge!\(\s*(\w+),[\s\S]*?\);\r?\n/gm,(_,name)=>'unsafe extern "C" fn '+name+'(){}\n');
+if(numeric.includes('naked_asm!')||numeric.includes('bridge!('))throw Error('incomplete instruction-hook adapter');
+const numericPath=path.join(require('./host').dir,'instruction-hooks-host.rs');
+fs.writeFileSync(numericPath,numeric);
 const source = `
 #![allow(dead_code, unused_parens)]
 extern crate alloc;
@@ -17,6 +25,7 @@ ${modulePath('Moveset-to-4G/src/config.rs', 'config')}
 ${modulePath('Moveset-to-4G/src/patches.rs', 'patches')}
 ${hostBridge('Moveset-to-4G/src/moveset.rs', 'moveset')}
 ${hostBridge('Moveset-to-4G/src/guard.rs', 'guard')}
+#[path = ${JSON.stringify(numericPath.replaceAll('\\','/'))}] mod instruction_hooks;
 mod style {
     use cb_game::player::ChargeBladePlayer;
     pub enum Feature { GpRecoil, GuardPerformance, ShieldThrustYellow, GuardRecoilYellow }
@@ -24,16 +33,25 @@ mod style {
     static mut SLOTS:[u32;3]=[0;3];
     pub fn collect(v:&mut Vec<crate::patch::BranchPatch>) {
         for (i,(offset,original,second)) in [(0x011D5C64,0xE35000A9,0x8A00030B),(0x0054924C,0xE7D17100,0xE30103C4),(0x00549784,0xE7927101,0xE5901000)].into_iter().enumerate() {
-            v.push(crate::patch::BranchPatch {offset,original,second,cheat_call:original,target:0x73300000+i as u32*4,continuation:unsafe{(&raw mut SLOTS).cast::<u32>().add(i)}});
+            v.push(crate::patch::BranchPatch {offset,original,second,cheat_call:original,target:0x73300000+i as u32*4,continuation:unsafe{(&raw mut SLOTS).cast::<u32>().add(i)},call_original:false});
         }
     }
 }
 mod config_file{pub fn get()->&'static crate::config::Config{&crate::config::Config::DEFAULT}}
+mod recovery {
+    static mut SLOTS:[u32;2]=[0;2];
+    pub fn collect(v:&mut Vec<crate::patch::BranchPatch>) {
+        for (i,(offset,original,second)) in [(0x011D6914,0xE28DD008,0xE8BD4010),(0x011DAD48,0xE1A00004,0xE3A01010)].into_iter().enumerate(){
+            v.push(crate::patch::BranchPatch{offset,original,second,cheat_call:original,target:0x73300010+i as u32*4,continuation:unsafe{(&raw mut SLOTS).cast::<u32>().add(i)},call_original:false});
+        }
+    }
+}
 thread_local! {
     static MEMORY: RefCell<BTreeMap<u32,u8>> = const { RefCell::new(BTreeMap::new()) };
     static CALLS: RefCell<Vec<(u32,u32)>> = const { RefCell::new(Vec::new()) };
     static LOGS: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
     static FAIL_AT: RefCell<usize> = const { RefCell::new(usize::MAX) };
+    static RESTORES: RefCell<Vec<u32>> = const { RefCell::new(Vec::new()) };
 }
 macro_rules! error { ($($arg:tt)*) => { LOGS.with(|v| v.borrow_mut().push(format!($($arg)*))) }; }
 fn get_bytes(addr:u32,len:usize)->Vec<u8> { MEMORY.with(|v| { let v=v.borrow(); (0..len).map(|i| v[&(addr+i as u32)]).collect() }) }
@@ -42,7 +60,7 @@ fn put_word(addr:u32,value:u32) { put_bytes(addr,&value.to_le_bytes()); }
 unsafe fn read_main(addr:u32)->u32 { u32::from_le_bytes(get_bytes(addr,4).try_into().unwrap()) }
 struct Patch { address:u32, original:Vec<u8>, replacement:Vec<u8>, active:bool }
 impl Patch {
-    fn new(address:u32,bytes:&[u8],enabled:bool)->Self { assert!(!enabled); Self { address,original:get_bytes(address,bytes.len()),replacement:bytes.to_vec(),active:false } }
+    fn new(address:u32,bytes:&[u8],enabled:bool)->Self { let mut p=Self { address,original:get_bytes(address,bytes.len()),replacement:bytes.to_vec(),active:false }; if enabled {p.enable();} p }
     fn addr(&self)->u32 { self.address }
     fn len(&self)->u32 { self.replacement.len() as u32 }
     fn enabled(&self)->bool { self.active }
@@ -51,17 +69,27 @@ impl Patch {
 }
 impl Drop for Patch { fn drop(&mut self) { self.disable(); } }
 unsafe fn flush_code(addr:u32,len:u32)->u32 {
-    let index=CALLS.with(|v| { let mut v=v.borrow_mut(); let n=v.len(); v.push((addr,len)); n });
-    FAIL_AT.with(|v| if *v.borrow()==index { 0x1234 } else { 0 })
+    assert_eq!(len,8);RESTORES.with(|v|v.borrow_mut().push(addr));0
+}
+mod runtime_hook {
+    pub unsafe fn create(address:u32,detour:*const core::ffi::c_void,original:*mut *const core::ffi::c_void) {
+        let index=crate::CALLS.with(|v| { let mut v=v.borrow_mut(); let n=v.len(); v.push((address,detour as u32)); n });
+        crate::put_word(address,0xE51FF004);
+        // 模拟写入口途中失败，安装层也必须恢复这一处，不能只恢复先前成功的 Hook。
+        if crate::FAIL_AT.with(|v|*v.borrow()==index) {return;}
+        crate::put_word(address+4,detour as u32);
+        if !original.is_null() {unsafe{original.cast::<u32>().write(address+0x01000000)};}
+    }
 }
 mod patch { use super::*; ${types} ${install} }
 const BASE:u32=0x60000000;
 fn reset(plan:&patches::Plan,cheated:bool) {
-    MEMORY.with(|v| v.borrow_mut().clear()); CALLS.with(|v| v.borrow_mut().clear()); LOGS.with(|v| v.borrow_mut().clear()); FAIL_AT.with(|v| *v.borrow_mut()=usize::MAX);
+    MEMORY.with(|v| v.borrow_mut().clear()); CALLS.with(|v| v.borrow_mut().clear()); LOGS.with(|v| v.borrow_mut().clear()); FAIL_AT.with(|v| *v.borrow_mut()=usize::MAX); RESTORES.with(|v|v.borrow_mut().clear());
     for &(site,old,new) in &plan.words { put_word(BASE+site,if cheated { new } else { old }); }
     for branch in &plan.branches {
         put_word(BASE+branch.offset,if cheated { branch.cheat_call } else { branch.original });
-        put_word(BASE+branch.offset+4,branch.second);
+        let second=if cheated {plan.words.iter().find(|w|w.0==branch.offset+4).map(|w|w.2).unwrap_or(branch.second)}else{branch.second};
+        put_word(BASE+branch.offset+4,second);
         unsafe { ptr::write_volatile(branch.continuation,0) };
     }
     for offset in (0x013F1EEC..0x013F1FA0).step_by(4) { put_word(BASE+offset,0xDEADC0DE); }
@@ -71,9 +99,9 @@ fn snapshot()->BTreeMap<u32,u8> { MEMORY.with(|v| v.borrow().clone()) }
 fn all_feature_combinations() {
     let groups:&[&[(u32,u32)]]=&[
         &[], &[${rows(fixtures.moveset.slice(7, 9))}], &[${rows(fixtures.moveset.slice(9))}], &[], &[],
-        &[${rows(fixtures.saed)}], &[${rows(fixtures.overpowered)}], &[], &[], &[], &[],
+        &[${rows(fixtures.saed)}], &[${rows(fixtures.overpowered)}], &[], &[], &[], &[], &[],
     ];
-    for mask in 0..2048u16 {
+    for mask in 0..4096u16 {
         let on=|bit:usize| mask&(1u16<<bit)!=0;
         let mut c=config::Config::DEFAULT;
         let styles=|on|if on {config::StyleSet::FOUR_G}else{config::StyleSet::NONE};
@@ -81,11 +109,12 @@ fn all_feature_combinations() {
         c.styles.shield_thrust_yellow=styles(on(8));
         c.styles.guard_performance=styles(on(9));
         c.styles.guard_recoil_yellow=styles(on(10));
+        c.styles.aed_recovery=styles(on(11));
         c.saed.enabled=on(5); c.styles.aed_followups=styles(on(6)); c.hitdata=on(7);
         let p=unsafe { patches::selected(BASE,&c) };
         let expected:Vec<_>=groups.iter().enumerate().filter(|(i,_)| on(*i)).flat_map(|(_,g)| g.iter().copied()).collect();
         assert_eq!(p.words.iter().map(|&(o,_,v)| (o,v)).collect::<Vec<_>>(),expected,"mask={mask}");
-        let branches:Vec<_>=[(true,0x011D5C64),(true,0x0054924C),(true,0x00549784),(on(3),0x011DDE74),(on(4)||on(8)||on(10),0x002EA87C),(on(9),0x011DFB0C),(on(9),0x002F0800)].into_iter().filter(|&(enabled,_)| enabled).map(|(_,o)|o).collect();
+        let branches:Vec<_>=[(true,0x011D5C64),(true,0x0054924C),(true,0x00549784),(on(11),0x011D6914),(on(11),0x011DAD48),(on(3),0x011DDE74),(on(4)||on(8)||on(10),0x002EA87C),(on(9),0x011DFB0C),(on(9),0x002F0800),(on(1),0x011DF8B0),(on(1),0x011DF8D0),(on(2),0x0048859C),(on(5),0x011DADD4),(on(5),0x011DBDA0),(on(5),0x011DADA0),(on(5),0x011DBD54),(on(5),0x0048906C),(on(5),0x011DE838)].into_iter().filter(|&(enabled,_)| enabled).map(|(_,o)|o).collect();
         assert_eq!(p.branches.iter().map(|b|b.offset).collect::<Vec<_>>(),branches);
         assert!(c.needs_hitdata()); assert_eq!(c.needs_phial(),on(5));
         c.enabled=false;
@@ -102,6 +131,10 @@ fn actual_ini_defaults_and_parsing() {
     assert!(config::Config::DEFAULT.styles.shield_thrust_yellow.is_empty());
     assert!(config::Config::DEFAULT.styles.guard_recoil_yellow.is_empty());
     assert!(config::Config::DEFAULT.moveset.j_guard_aed);
+    assert_eq!(config::Config::DEFAULT.styles.aed_recovery,config::StyleSet::NONE);
+    assert!(config::Config::parse("[plugin]\\nenabled=true").unwrap().styles.aed_recovery.is_empty());
+    assert_eq!(config::Config::parse("[styles]\\naed_recovery=6").unwrap().styles.aed_recovery,config::StyleSet::FOUR_G);
+    assert_eq!(config::Config::DEFAULT.moveset.aed_recovery_frames,20);
     for id in 0..=255 {
         for (index,set) in [config::Config::DEFAULT.styles.yellow_shield_aed,config::Config::DEFAULT.styles.gp_recoil,config::Config::DEFAULT.styles.guard_performance].into_iter().enumerate() {
             assert_eq!(set.contains(id),id==6||(index==0&&id==3),"AED defaults to Adept/4G; GP and guard remain 4G only");
@@ -196,23 +229,23 @@ fn legacy_masters_migrate_without_overriding_explicit_lists() {
     }
 }
 #[test]
-fn every_preflight_field_and_cache_failure_rolls_back() {
-    let mut c=config::Config::DEFAULT;c.styles.aed_followups=config::StyleSet::ALL; let p=unsafe { patches::selected(BASE,&c) };
-    assert_eq!((p.words.len(),p.branches.len()),(24,7));
+fn every_preflight_field_and_hook_failure_rolls_back() {
+    let mut c=config::Config::DEFAULT;c.styles.aed_followups=config::StyleSet::ALL;c.styles.aed_recovery=config::StyleSet::FOUR_G; let p=unsafe { patches::selected(BASE,&c) };
+    assert_eq!((p.words.len(),p.branches.len()),(24,18));
     let offsets:Vec<_>=p.words.iter().map(|w|w.0).chain(p.branches.iter().flat_map(|b|[b.offset,b.offset+4])).collect();
     for cheated in [false,true] {
-        reset(&p,cheated); assert!(unsafe { patches::install(BASE,&c) });
-        for &(offset,_,replacement) in &p.words { assert_eq!(unsafe{read_main(BASE+offset)},replacement); }
-        for b in &p.branches { assert_eq!(unsafe{read_main(BASE+b.offset)},0xE51FF004); assert_eq!(unsafe{read_main(BASE+b.offset+4)},b.target); assert_eq!(unsafe{ptr::read_volatile(b.continuation)},BASE+b.offset+8); }
+        reset(&p,cheated); let before=snapshot(); assert!(unsafe { patches::install(BASE,&c) });
+        for (&address,&byte) in &before {if !p.branches.iter().any(|b|address>=BASE+b.offset&&address<BASE+b.offset+8){assert_eq!(get_bytes(address,1)[0],byte,"no direct word/literal patch");}}
+        for b in &p.branches { assert_eq!(unsafe{read_main(BASE+b.offset)},0xE51FF004); assert_eq!(unsafe{read_main(BASE+b.offset+4)},b.target); assert_eq!(unsafe{ptr::read_volatile(b.continuation)},if b.call_original{BASE+b.offset+0x01000000}else{BASE+b.offset+8}); }
         for offset in (0x013F1EEC..0x013F1FA0).step_by(4) { assert_eq!(unsafe{read_main(BASE+offset)},0xDEADC0DE); }
-        assert_eq!(CALLS.with(|v|v.borrow().len()),31);
-        for failed in 0..31 {
+        assert_eq!(CALLS.with(|v|v.borrow().len()),18);assert!(RESTORES.with(|v|v.borrow().is_empty()),"Forge owns normal cache maintenance");
+        for failed in 0..18 {
             reset(&p,cheated); FAIL_AT.with(|v|*v.borrow_mut()=failed); let before=snapshot();
-            assert!(!unsafe{patches::install(BASE,&c)}); assert_eq!(snapshot(),before); assert_eq!(CALLS.with(|v|v.borrow().len()),(failed+1)*2);
+            assert!(!unsafe{patches::install(BASE,&c)}); assert_eq!(snapshot(),before); assert_eq!(CALLS.with(|v|v.borrow().len()),failed+1);assert_eq!(RESTORES.with(|v|v.borrow().len()),failed+1);
         }
     }
     for offset in offsets { reset(&p,false); put_word(BASE+offset,0xBAD0BAD0); let before=snapshot(); assert!(!unsafe{patches::install(BASE,&c)}); assert_eq!(snapshot(),before); assert!(CALLS.with(|v|v.borrow().is_empty())); }
 }
 `;
 run('verify-config-install', source, ['--test-threads=1'], true);
-console.log('PASS: INI/defaults/errors, eight style IDs and out-of-range rejection, fixed AED shake, legacy key migration, 2048 feature combinations and 62 transaction rollback cases; public actions/HDP stay registered');
+console.log('PASS: INI/defaults/errors, 4096 feature combinations, 18 standard Forge hooks, untouched main literals/instructions outside hooks and 36 partial-install rollback cases; public actions/HDP stay registered');

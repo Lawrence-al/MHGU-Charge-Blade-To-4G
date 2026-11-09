@@ -212,6 +212,7 @@ pub unsafe fn collect(
             second: GP_SECOND,
             target: gp_bridge as *const () as u32,
             continuation: ptr::addr_of_mut!(MAIN_CONTINUATION),
+            call_original: false,
         });
     }
     if config.moveset.j_guard_aed
@@ -225,6 +226,7 @@ pub unsafe fn collect(
             second: J_GUARD_SECOND,
             target: j_guard_bridge as *const () as u32,
             continuation: ptr::addr_of_mut!(J_GUARD_CONTINUATION),
+            call_original: false,
         });
     }
 }

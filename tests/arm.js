@@ -62,6 +62,7 @@ class Arm {
       const pc = this.r[15], ins = this.read(pc), cond = ins >>> 28;
       this.r[15] = (pc + 4) >>> 0;
       if (ins === 0xF57FF04F || ins === 0xF57FF06F || ins === 0xE320F000) continue;
+      if (cond === 15) throw Error('不支持的无条件指令 0x' + ins.toString(16));
       const { n, z, c, v } = this.flags;
       const passed = [z, !z, c, !c, n, !n, v, !v, c && !z, !c || z,
         n === v, n !== v, !z && n === v, z || n !== v, true, false];
@@ -205,8 +206,14 @@ class Arm {
           if (op === 8 || ins & (1 << 20)) this.flags = {
             n: !!(result >>> 31), z: result === 0, c: operand.carry, v: this.flags.v,
           };
+        } else if (op === 4 || op === 11) {
+          const sum = a + value, result = sum >>> 0;
+          if (op === 11 || ins & (1 << 20)) this.flags = {
+            n: !!(result >>> 31), z: result === 0, c: sum > 0xFFFFFFFF,
+            v: !!((~(a ^ value) & (a ^ result)) >>> 31),
+          };
+          if (op === 4) this.r[rd] = result;
         } else if (op === 12) this.r[rd] = a | value;
-        else if (op === 4) this.r[rd] = a + value;
         else if (op === 13) this.r[rd] = value;
         else if (op === 15) this.r[rd] = ~value;
         else throw Error('不支持的 ALU 指令 0x' + ins.toString(16));

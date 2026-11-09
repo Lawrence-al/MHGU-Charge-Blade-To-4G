@@ -102,6 +102,7 @@ pub fn install(base: u32, attachment: bool, blast: bool, aed_repeat: bool) {
             second: 0xE5850000, // STR r0,[r5]
             target: attachment_bridge as *const () as u32,
             continuation: ptr::addr_of_mut!(ATTACHMENT_CONTINUATION),
+            call_original: false,
         });
     }
     if blast {
@@ -112,6 +113,7 @@ pub fn install(base: u32, attachment: bool, blast: bool, aed_repeat: bool) {
             second: 0xE3500000, // CMP r0,#0；原 STR 留在返回点
             target: blast_bridge as *const () as u32,
             continuation: ptr::addr_of_mut!(BLAST_CONTINUATION),
+            call_original: false,
         });
     }
     if aed_repeat {
@@ -122,6 +124,7 @@ pub fn install(base: u32, attachment: bool, blast: bool, aed_repeat: bool) {
             second: 0xE3500000, // CMP r0,#0
             target: repeat_bridge as *const () as u32,
             continuation: ptr::addr_of_mut!(REPEAT_CONTINUATION),
+            call_original: false,
         });
     }
     if !branches.is_empty() {

@@ -1,4 +1,5 @@
-// 超解变 4G：保留第三下斧命中与瓶伤补丁，瓶爆计时／位置由 phial.rs 接管。
+// 旧超解金手指的完整兼容签名；等效逻辑由 instruction_hooks.rs 的六个Hook执行。
+// 本表只核对原版/已启用旧金手指的指令，不再把 replacement 写入 main。
 use crate::{config::SaedConfig, patch::WordPatch};
 use alloc::vec::Vec;
 
@@ -33,7 +34,7 @@ const WORD_PATCHES: &[WordPatch] = &[
     (0x011DE83C, 0x0A000007, 0x1A000007), // beq -> bne 0x011DE860
 ];
 
-/// 超解总开关同时控制第三 hit、瓶伤和特效选档，共 21 处直接改值。
+/// 超解总开关同时核对第三 hit、瓶伤和特效选档的 21 处原始/旧金手指值。
 pub fn collect(config: &SaedConfig, words: &mut Vec<WordPatch>) {
     if !config.enabled {
         return;

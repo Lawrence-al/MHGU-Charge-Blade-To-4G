@@ -66,6 +66,10 @@ fn draw_settings() {
                 );
                 imgui::checkbox(c"Patch common SRQ", &mut c.patch_srq);
                 imgui::checkbox(c"Patch effect companion sounds (PTS)", &mut c.patch_pts);
+                imgui::checkbox(c"Mute phial blood sound", &mut c.mute_aed_phial_blood);
+                imgui::text("Mute phial hit blood sounds for shield thrust, ED1/ED2, AED and SAED.");
+                imgui::checkbox(c"Yellow / red phial charge sound (PTS)", &mut c.phial_charge_cues);
+                imgui::text("The yellow / red charge effects play the 0 dB cue through PTS.");
                 imgui::slider_float(
                     c"Request 0x4A volume",
                     &mut c.volume_4a,

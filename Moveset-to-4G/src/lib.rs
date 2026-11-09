@@ -9,11 +9,13 @@ mod config_io;
 mod guard;
 mod hitdata;
 mod hooks;
+mod instruction_hooks;
 mod moveset;
 mod overpowered;
 #[path = "../../shared/patch.rs"]
 mod patch;
 mod patches;
+mod recovery;
 #[path = "../../shared/runtime_hook.rs"]
 mod runtime_hook;
 mod saed;

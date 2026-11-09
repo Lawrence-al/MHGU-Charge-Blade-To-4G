@@ -177,6 +177,7 @@ pub fn collect(branches: &mut Vec<BranchPatch>) {
         second: DISPATCH_SECOND,
         target: dispatch_bridge as *const () as u32,
         continuation: &raw mut DISPATCH_CONTINUATION,
+        call_original: false,
     });
 }
 

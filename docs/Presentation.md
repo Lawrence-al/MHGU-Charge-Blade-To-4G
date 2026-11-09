@@ -1,8 +1,14 @@
 # Presentation-to-4G：表现力变 4G
 
+Sound中的“Yellow / red phial charge sound (PTS)”（`phial_charge_cues`）默认开启。黄/红充能特效UNIQUE 0x26C/0x26D的原PTS创建事件调用私有0x57，音量为0dB、启播延迟为0，播放时机和挂点由原特效流程决定。关闭开关时由原PTS调用0x4D。
+
+`sounds.enabled`同时控制一二解/大解的逐次瓶爆声。在原生`0048874C`每次瓶伤后，按当次爆点及房间提交专用公共请求0x7D3/0x7D4，三连分别发声，不依赖GU/4G视觉选择。榴弹为-6dB、并发2；强属性为-4.5dB、并发4；均为零启动延迟、10ms重播。只追加请求，原公共187/188保持。对应208/209/212/213的原PTS创建声撤下以免首爆重复，命中0x4B和超解声音保持原样。关闭`sounds.enabled`时不做这一组替换；本组与`patch_srq/patch_pts`独立。实现与验证见[本次报告](2026-11-07_实现-攒瓶增益与逐次瓶爆音效-report.md)。
+
+Sound中的“Mute phial blood sound”默认开启，INI沿用`mute_aed_phial_blood`。2026-11-07将过滤范围扩展到盾突、一二解、大解及超解瓶爆命中的公共血声0x82/83/84，按直接来源Shell002/003识别。设置保存后重启生效。
+
 产物：`cb_presentation_to_4g.nro`。原音效／特效代码迁入该子项目，动作表和特效持续帧保持原设置。现在也会在游戏加载时复现下面两份 asset 的修改，游戏中的这两份资源可以使用 dump 原版。
 
-设置文件为 MHGU 当前用户存档根目录的 `cb_presentation_to_4g.ini`，缺少时自动生成；仓库默认模板位于 [conf/cb_presentation_to_4g.ini](../conf/cb_presentation_to_4g.ini)。Forge → Plugin UI → **CB Presentation to 4G** 可修改音效／特效总开关、SRQ／PTS 修改开关、0x4A 音量、盾突闪电持续帧，以及各任务的启停、触发帧、闪电持续帧。点击 Save INI 写回同一文件，重启生效。下面表格为默认值。
+设置文件为 `cb_presentation_to_4g.ini`，Switch和Ryujinx自动使用当前用户存档根目录，三套重编译使用 `romfs/nativeNX/plugins/`。默认模板位于 [conf/cb_presentation_to_4g.ini](../conf/cb_presentation_to_4g.ini)。Forge → Plugin UI → **CB Presentation to 4G** 可修改音效／特效总开关、SRQ／PTS修改开关、0x4A音量、盾突闪电持续帧，以及各任务的启停、触发帧、闪电持续帧。Save INI写回菜单显示的位置，重启生效。下面表格为默认值。
 
 | 阶段 | actionState | variant | 创建帧 | 榴弹瓶 / 强属性瓶 effectId | 持续帧 |
 |---|---|---|---|---|---|
@@ -36,7 +42,7 @@
 
 `0x4A` 的 `+0x34` 是重播间隔；启播延迟为 `+0x30`，保持原版 0。`+0x14/+0x15` 为两个 u8，分别是优先级／替换方式，当前 110／1；`+0x12` 是分组第三项，不是淡出时间。`0x54` 必须在原函数绑定音库前修改，才能让它的音库索引正常转换为资源引用。PTS 按对象字段 `+0xC`（request）和 `+0xE`（事件）修改，不把文件偏移当成内存偏移。完整当前字段见 [五个插件清单](Plugins.md)。
 
-SRQ 参数快照和 PTS 固定规则直接保存在 `resource.rs`，构建和运行都不打开这两份 asset 文件；调整规则后重新编译。已修改的资源也可继续使用，重复应用的结果一致；`0x1F5` 的 request `0x52`、SEQUENCE `0x22B` 的 `0x4A / 0x56` 保持原值。
+SRQ 参数快照和 PTS 固定规则直接保存在 `resource.rs`，构建和运行都不打开这两份 asset 文件；调整规则后重新编译。已修改的资源也可继续使用，重复应用的结果一致；`0x1F5` 的 request `0x52`、SEQUENCE `0x22B` 的 `0x4A / 0x56` 保持原值。独立的充能提示开关在绑定前追加0x57，并将UNIQUE 0x26C/0x26D的PTS创建事件请求号由0x4D改为0x57，事件类型沿用原值1。该开关独立于上述SRQ/PTS旧规则开关。
 
 这次只替代这两份 SRQ / PTS 的修改；其它 PSL、PEL、动作值、瓶爆间隔和音库资源仍按原配置部署。原始加载函数已验证资源有效后才访问缓冲区／条目对象，沿用它的指针有效前提。
 

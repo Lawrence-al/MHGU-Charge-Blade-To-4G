@@ -1,4 +1,4 @@
-//! 两个盾斧插件共用同一套存档根目录读写；不读取 SD 或 ROMFS 配置。
+//! 两个盾斧插件按运行环境选择存档或plugins配置读写。
 #[path = "config_storage.rs"]
 mod storage;
 #[allow(unused_imports)]

@@ -107,20 +107,46 @@ pub fn patch_pts_entry(entry: &mut [u8]) {
     }
 }
 
-/// SRQR 绑定前只修改对应武器路径的原始记录。
-pub unsafe fn before_srq_bind(address: u32, volume: f32) {
+/// SRQR绑定前追加公共瓶爆请求，或修改盾斧私有表；原公共请求不覆盖。
+pub unsafe fn before_srq_bind(address: u32, patch_srq: bool, volume: f32, charge_cues: bool, phial_sounds: bool) {
     let mut resource = cb_game::resource::SoundRequestResource::from_address(address);
+    if phial_sounds && path_matches(unsafe { resource.path() }, crate::phial_sound::SRQ_PATH) {
+        let requests = crate::phial_sound::requests(unsafe { resource.bytes_mut() });
+        if !unsafe { resource.append_records(crate::state::STATE.game(), &requests) } {
+            forge::log::prelude::error!("presentation-to-4g: phial sound SRQ allocation failed");
+        }
+        return;
+    }
     if !path_matches(unsafe { resource.path() }, SRQ_PATH) {
         return;
     }
-    patch_srq_data_with_volume(unsafe { resource.bytes_mut() }, volume);
+    if patch_srq { patch_srq_data_with_volume(unsafe { resource.bytes_mut() }, volume); }
+    if charge_cues {
+        let request = crate::charge::charge_request(unsafe { resource.bytes_mut() });
+        if !unsafe { resource.append_record(crate::state::STATE.game(), &request) } {
+            forge::log::prelude::error!("presentation-to-4g: charge sound SRQ allocation failed");
+        }
+    }
+}
+
+/// 黄/红充能光的PTS创建事件选用0dB私有请求，沿用原创建事件及挂点。
+pub fn patch_charge_pts_entry(entry: &mut [u8]) {
+    let mut entry = PtsEntry::new(entry);
+    if matches!((entry.effect_type(), entry.effect_id(), entry.request_id(), entry.event()),
+        (2, 0x26C | 0x26D, 0x4D, 1)) {
+        entry.set_request_id(crate::charge::REQUEST);
+    }
 }
 
 /// PTS load 成功后只修改对应路径的运行时记录。
-pub unsafe fn after_pts_load(address: u32) {
+pub unsafe fn after_pts_load(address: u32, patch_pts: bool, charge_cues: bool, phial_sounds: bool) {
     let resource = cb_game::resource::PtsResource::from_address(address);
     if !path_matches(unsafe { resource.path() }, PTS_PATH) {
         return;
     }
-    unsafe { resource.for_each_entry(patch_pts_entry) };
+    unsafe { resource.for_each_entry(|entry| {
+        if patch_pts { patch_pts_entry(entry); }
+        if charge_cues { patch_charge_pts_entry(entry); }
+        if phial_sounds { crate::phial_sound::patch_pts_entry(entry); }
+    }) };
 }

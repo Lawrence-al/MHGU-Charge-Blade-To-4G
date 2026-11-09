@@ -1,16 +1,19 @@
-// main 补丁插件共用的安装与 ARM32 缓存刷新；不分配代码洞。
+// main 入口／内部桥统一通过 Forge Hook 安装；不分配代码洞。
 extern crate alloc;
 
+use crate::runtime_hook;
 use alloc::vec::Vec;
 use core::arch::naked_asm;
 use core::{mem, ptr};
 use forge::log::prelude::error;
 use forge::patch::Patch;
 
-/// (main 偏移，原版值，金手指值)。
+/// (main 偏移，原版值，兼容的旧金手指值)。只做完整签名核对，不写指令。
+/// 等效行为由同组 BranchPatch 的 NRO 桥执行，包括原来放在 main 的浮点常量。
 pub type WordPatch = (u32, u32, u32);
 
-/// 一个 8 字节绝对跳转；桥接函数负责补回 second，并返回 offset + 8。
+/// 标准 Forge Hook；内部桥负责补回被覆盖的指令，continuation 接收 offset + 8。
+/// call_original 的入口替换则接收 Forge 提供的 original，不能自行续跳函数 +8。
 pub struct BranchPatch {
     pub offset: u32,
     pub original: u32,
@@ -18,6 +21,7 @@ pub struct BranchPatch {
     pub second: u32,
     pub target: u32,
     pub continuation: *mut u32,
+    pub call_original: bool,
 }
 
 const ARM_ABSOLUTE_JUMP: u32 = 0xE51FF004; // ldr pc, [pc, #-4]
@@ -42,7 +46,8 @@ unsafe extern "C" fn flush_code(_address: u32, _size: u32) -> u32 {
     );
 }
 
-/// 先核对整组原值，再安装；缓存刷新失败时恢复本组已经写入的全部字节。
+/// 先核对整组原值，再调用标准 Hook 接口。安装失败时恢复已经写入的入口。
+/// 正常路径由 Forge 完成代码映射／缓存维护；重编译端也能登记内部函数范围。
 pub unsafe fn install(
     name: &str,
     game_base: u32,
@@ -62,7 +67,12 @@ pub unsafe fn install(
         let site = game_base + branch.offset;
         let first = unsafe { ptr::read_volatile(site as *const u32) };
         let second = unsafe { ptr::read_volatile((site + 4) as *const u32) };
-        if (first != branch.original && first != branch.cheat_call) || second != branch.second {
+        let legacy_second = words
+            .iter()
+            .any(|&(offset, _, legacy)| offset == branch.offset + 4 && second == legacy);
+        if (first != branch.original && first != branch.cheat_call)
+            || (second != branch.second && !legacy_second)
+        {
             error!(
                 "{name}: main+0x{:08X}=0x{first:08X}, next=0x{second:08X}; expected 0x{:08X}/0x{:08X} and 0x{:08X}, patches skipped",
                 branch.offset, branch.original, branch.cheat_call, branch.second
@@ -71,44 +81,39 @@ pub unsafe fn install(
         }
     }
 
-    let mut patches = Vec::with_capacity(words.len() + branches.len());
-    for &(offset, _, replacement) in words {
-        patches.push(Patch::new(
-            game_base + offset,
-            &replacement.to_le_bytes(),
-            false,
-        ));
-    }
+    let mut installed: Vec<(u32, [u8; 8])> = Vec::with_capacity(branches.len());
     for branch in branches {
         let site = game_base + branch.offset;
-        unsafe { ptr::write_volatile(branch.continuation, site + 8) };
-        let mut jump = [0u8; 8];
-        jump[..4].copy_from_slice(&ARM_ABSOLUTE_JUMP.to_le_bytes());
-        jump[4..].copy_from_slice(&branch.target.to_le_bytes());
-        patches.push(Patch::new(site, &jump, false));
-    }
-
-    let failed = patches.iter_mut().find_map(|patch| {
-        patch.enable();
-        let result = unsafe { flush_code(patch.addr(), patch.len()) };
-        (result != 0).then_some((patch.addr(), result))
-    });
-    if let Some((address, result)) = failed {
-        for patch in patches.iter_mut().rev().filter(|patch| patch.enabled()) {
-            patch.disable();
-            unsafe { flush_code(patch.addr(), patch.len()) };
-        }
-        error!(
-            "{name}: cache flush at 0x{address:08X} failed 0x{result:08X}; original bytes restored"
+        let mut before = [0u8; 8];
+        before[..4]
+            .copy_from_slice(&unsafe { ptr::read_volatile(site as *const u32) }.to_le_bytes());
+        before[4..].copy_from_slice(
+            &unsafe { ptr::read_volatile((site + 4) as *const u32) }.to_le_bytes(),
         );
-        return false;
-    }
-    // main 仍跳到本 NRO，保持 Patch 存活到进程结束，避免 Drop 立即撤销。
-    for patch in patches {
-        mem::forget(patch);
+        let original = if branch.call_original {
+            branch.continuation.cast()
+        } else {
+            unsafe { ptr::write_volatile(branch.continuation, site + 8) };
+            ptr::null_mut()
+        };
+        unsafe { runtime_hook::create(site, branch.target as *const _, original) };
+        installed.push((site, before));
+        let first = unsafe { ptr::read_volatile(site as *const u32) };
+        let target = unsafe { ptr::read_volatile((site + 4) as *const u32) };
+        if first != ARM_ABSOLUTE_JUMP || target != branch.target {
+            // Hook API 没有销毁接口；仅在失败恢复路径用 Patch 放回原字节。
+            // 入口／内部返回槽仍留在 NRO 中，已登记的解释范围可以继续执行原代码。
+            for &(address, bytes) in installed.iter().rev() {
+                let restore = Patch::new(address, &bytes, true);
+                unsafe { flush_code(address, 8) };
+                mem::forget(restore);
+            }
+            error!("{name}: Forge Hook at 0x{site:08X} failed; original bytes restored");
+            return false;
+        }
     }
     error!(
-        "{name}: {} word patches and {} NRO branches installed; main codecave untouched",
+        "{name}: {} instruction checks and {} Forge hooks installed; main codecave untouched",
         words.len(),
         branches.len()
     );

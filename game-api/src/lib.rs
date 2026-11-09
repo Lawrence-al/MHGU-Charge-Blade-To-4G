@@ -6,6 +6,7 @@ pub mod abi;
 pub mod command;
 pub mod effect;
 pub mod memory;
+pub mod motion;
 pub mod player;
 pub mod resource;
 pub mod shell;

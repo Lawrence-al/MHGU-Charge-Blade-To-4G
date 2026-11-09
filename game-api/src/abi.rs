@@ -32,6 +32,29 @@ pub unsafe extern "C" fn frame_event(_function: u32, _player: u32, _frame: u32) 
     );
 }
 
+/// Make_AnimationCM接受r0=玩家、r1=动画、r2=模式，s0=混合参数、s1=起始帧。
+/// 第五个Rust参数位于原sp；S2由游戏包装函数设置为1，不依赖调用者遗留VFP值。
+#[cfg(target_arch = "arm")]
+#[unsafe(naked)]
+pub unsafe extern "C" fn animation_call(
+    _function: u32, _player: u32, _motion: u32, _mode: u32, _blend: u32,
+) -> u32 {
+    naked_asm!(
+        ".arm",
+        "push {{r4, lr}}",
+        "mov r12, r0",
+        "mov r0, r1",
+        "mov r1, r2",
+        "mov r2, r3",
+        "ldr r4, [sp, #8]",
+        "vmov s0, r4",
+        "mov r4, #0",
+        "vmov s1, r4",
+        "blx r12",
+        "pop {{r4, pc}}",
+    );
+}
+
 #[cfg(target_arch = "arm")]
 #[unsafe(naked)]
 pub unsafe extern "C" fn float_call8(_function: u32, _arguments: *const [u32; 8]) -> u32 {
@@ -66,6 +89,11 @@ pub unsafe fn trig_call(_: u32, _: u32) -> u32 {
 #[cfg(not(target_arch = "arm"))]
 pub unsafe fn frame_event(_: u32, _: u32, _: u32) -> u32 {
     unreachable!("ARM32 VFP 调用仅支持游戏进程")
+}
+
+#[cfg(not(target_arch = "arm"))]
+pub unsafe fn animation_call(_: u32, _: u32, _: u32, _: u32, _: u32) -> u32 {
+    unreachable!("ARM32动画混合调用仅支持游戏进程")
 }
 
 #[cfg(not(target_arch = "arm"))]

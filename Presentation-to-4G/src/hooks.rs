@@ -3,7 +3,7 @@
 
 // use forge::log::prelude::error;
 
-use crate::{action, effect, phial, preview, resource};
+use crate::{action, action_bridges, effect, phial, preview, resource};
 use cb_game::{effect::EffectNode, player::ChargeBladePlayer, sound::SoundSequence};
 
 // ============================================================================
@@ -19,10 +19,11 @@ fn hook_cb_player_move(player_actor: u32) -> u32, |original| {
 }
 }
 
-// 在原函数建立音库引用前，修改已读入的盾斧 common SRQR。
+// 在原函数建立音库引用前，修改盾斧SRQR并追加两条公共瓶爆专用请求。
 crate::cb_hook! { 0x00B67AE4,
 fn hook_srq_resource_bind(sound_request: u32) -> u32, |original| {
-    unsafe { resource::before_srq_bind(sound_request, crate::config_file::get().volume_4a) };
+    let config = crate::config_file::get();
+    unsafe { resource::before_srq_bind(sound_request, config.patch_srq, config.volume_4a, config.phial_charge_cues, config.sounds) };
     unsafe { original(sound_request) }
 }
 }
@@ -32,7 +33,8 @@ crate::cb_hook! { 0x004D923C,
 fn hook_pts_resource_load(pel_tied_se: u32, stream: u32) -> u32, |original| {
     let result = unsafe { original(pel_tied_se, stream) };
     if result != 0 {
-        unsafe { resource::after_pts_load(pel_tied_se) };
+        let config = crate::config_file::get();
+        unsafe { resource::after_pts_load(pel_tied_se, config.patch_pts, config.phial_charge_cues, config.sounds) };
     }
     result
 }
@@ -64,24 +66,14 @@ fn hook_se_command_dispatch(
 // 判定与执行都在 [`action::on_phial_action_frame`] 里，这里只读 actionState 后转发。
 crate::cb_hook! { 0x011DABC8,
 fn hook_cb_phial_action(player_actor: u32, variant: u32) -> u32, |original| {
-    let player = ChargeBladePlayer::from_address(player_actor);
-    let action_state = unsafe { player.action_state() };
-    unsafe { action::on_phial_action_frame(player, variant, action_state) };
-    let result = unsafe { original(player_actor, variant) };
-    unsafe { phial::on_action_frame(player, variant, action_state) };
-    result
+    unsafe { action_bridges::update_action(player_actor, variant, original) }
 }
 }
 
 // 真正发瓶前捕获瓶数，保留原返回值；无瓶尘土011DEA04不再创建103。
 crate::cb_hook! { 0x011DE7E4,
 fn hook_saed_create(player_actor: u32, aerial: u32) -> u32, |original| {
-    let player = ChargeBladePlayer::from_address(player_actor);
-    let before = unsafe { player.action_state() };
-    let had_phial = unsafe { player.phial_count() } != 0;
-    let result = unsafe { original(player_actor, aerial) };
-    unsafe { phial::on_saed_created(player, before, had_phial) };
-    result
+    unsafe { action_bridges::create_saed(player_actor, aerial, original) }
 }
 }
 
@@ -97,9 +89,11 @@ fn hook_player_sequence_effect(player_actor: u32, handle: u32, kind: u32, id: u3
 
 crate::cb_hook! { 0x0048874C,
 fn hook_phial_damage(shell: u32) -> u32, |original| {
-    let attachment = unsafe { phial::first_blast_attachment(cb_game::effect::WeaponEffectShell::from_address(shell)) };
+    let shell_view = cb_game::effect::WeaponEffectShell::from_address(shell);
+    let attachment = unsafe { phial::first_blast_attachment(shell_view) };
     let result = unsafe { original(shell) };
     if let Some(node) = attachment { unsafe { node.stop_immediately(crate::state::STATE.game()) }; }
+    if crate::config_file::get().sounds { unsafe { crate::phial_sound::on_blast(shell_view) }; }
     result
 }
 }
@@ -216,12 +210,20 @@ fn hook_attack_hit_monster(
 // 游戏对象字段和原生调用分别由 cb-game 的对应对象管理。
 pub fn enable(game_base: u32) {
     let config = crate::config_file::get();
+    if config.mute_aed_phial_blood { crate::sound_bridge::install(game_base); }
     forge::install_hook!(game_base, hook_cb_player_move);
-    if config.patch_srq { forge::install_hook!(game_base, hook_srq_resource_bind); }
-    if config.patch_pts { forge::install_hook!(game_base, hook_pts_resource_load); }
+    if config.patch_srq || config.phial_charge_cues || config.sounds { forge::install_hook!(game_base, hook_srq_resource_bind); }
+    if config.patch_pts || config.phial_charge_cues || config.sounds { forge::install_hook!(game_base, hook_pts_resource_load); }
     if config.sounds { forge::install_hook!(game_base, hook_se_command_dispatch); }
-    if config.sounds || config.effects || config.four_g.aed_explosion || config.four_g.saed_explosion {
-        forge::install_hook!(game_base, hook_cb_phial_action);
+    let action_enabled = config.sounds || config.effects || config.four_g.aed_explosion || config.four_g.saed_explosion;
+    // 复用已缓存的环境识别。原版继续安装函数入口钩子，重编译使用序言后的内部桥。
+    let recompiled = crate::config_io::PRESENTATION.path()
+        .is_ok_and(|path| path == crate::config_io::PRESENTATION.plugin_path);
+    if recompiled {
+        action_bridges::install(game_base, action_enabled, config.four_g.saed_explosion);
+    } else {
+        if action_enabled { forge::install_hook!(game_base, hook_cb_phial_action); }
+        if config.four_g.saed_explosion { forge::install_hook!(game_base, hook_saed_create); }
     }
     if config.sounds || config.effects {
         forge::install_hook!(game_base, hook_cb_burst_action);
@@ -229,9 +231,8 @@ pub fn enable(game_base: u32) {
     if config.effects {
         if config.shield_thrust { forge::install_hook!(game_base, hook_cb_shield_thrust_action); }
     }
-    if config.four_g.saed_explosion { forge::install_hook!(game_base, hook_saed_create); }
     if config.four_g.aed_explosion { forge::install_hook!(game_base, hook_player_sequence_effect); }
-    if config.four_g.phial_attachment { forge::install_hook!(game_base, hook_phial_damage); }
+    if config.four_g.phial_attachment || config.sounds { forge::install_hook!(game_base, hook_phial_damage); }
     if config.four_g.saed_blast { forge::install_hook!(game_base, hook_defined_effect); }
     phial::enable(game_base);
     // 逐个预览也需要计时与析构撤销。

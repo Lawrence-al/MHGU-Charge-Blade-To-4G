@@ -268,6 +268,7 @@ pub fn collect(branches: &mut Vec<BranchPatch>) {
         second: 0xE30103C4,
         target: style_confirm_bridge as *const () as u32,
         continuation: ptr::addr_of_mut!(CONFIRM_CONTINUATION),
+        call_original: false,
     });
     branches.push(BranchPatch {
         offset: COMPARE_SITE,
@@ -276,6 +277,7 @@ pub fn collect(branches: &mut Vec<BranchPatch>) {
         second: 0xE5901000,
         target: style_compare_bridge as *const () as u32,
         continuation: ptr::addr_of_mut!(COMPARE_CONTINUATION),
+        call_original: false,
     });
 }
 

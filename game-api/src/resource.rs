@@ -97,6 +97,69 @@ impl SoundRequestResource {
             )
         }
     }
+
+    /// 绑定前扩容原始SRQR；沿用rSoundRequest自己的分配器和分配标记。
+    /// 原生绑定器随后建立音库引用/请求索引，原生析构器释放新缓冲区。
+    pub unsafe fn append_record(&mut self, game: Game, record: &[u8; SRQ_RECORD_SIZE]) -> bool {
+        unsafe { self.append_records(game, core::slice::from_ref(record)) }
+    }
+
+    /// 同一组请求只分配一次；分配失败时原表和其中全部请求保持原值。
+    pub unsafe fn append_records(&mut self, game: Game, records: &[[u8; SRQ_RECORD_SIZE]]) -> bool {
+        let old_data = unsafe { memory::read_u32(self.0.0 + 0x64) };
+        // 最后一张表是8字节曲线点；路径字符串均位于该表之前。
+        let size = unsafe { memory::read_u32(old_data + 0x30)
+            + 8 * memory::read_u32(old_data + 0x18) } as usize;
+        let get: unsafe extern "C" fn(u32) -> u32 = unsafe { game.function(0x007AA47C) };
+        let allocator = unsafe { get(game.address(0x02125BEC)) };
+        let allocate: unsafe extern "C" fn(u32, u32, u32, u32) -> u32 =
+            unsafe { memory::method(allocator, 0x20) };
+        let flags = unsafe { memory::read_u32(game.address(0x02125C08)) };
+        let new_size = size + records.len() * SRQ_RECORD_SIZE;
+        let new_data = unsafe { allocate(allocator, new_size as u32, 16, flags) };
+        if new_data == 0 { return false; }
+        unsafe {
+            append_srq_records(
+                core::slice::from_raw_parts(old_data as *const u8, size),
+                core::slice::from_raw_parts_mut(new_data as *mut u8, new_size),
+                records,
+            );
+            memory::write_u32(self.0.0 + 0x64, new_data);
+            let free: unsafe extern "C" fn(u32, u32) = memory::method(allocator, 0x34);
+            free(allocator, old_data);
+        }
+        true
+    }
+}
+
+/// SRQR记录后面还有音库路径/曲线表；追加时必须移动尾部并重定位文件相对偏移。
+pub fn append_srq_record(data: &[u8], out: &mut [u8], record: &[u8; SRQ_RECORD_SIZE]) {
+    append_srq_records(data, out, core::slice::from_ref(record));
+}
+
+pub fn append_srq_records(data: &[u8], out: &mut [u8], records: &[[u8; SRQ_RECORD_SIZE]]) {
+    let word = |at: usize| u32::from_le_bytes(data[at..at + 4].try_into().unwrap()) as usize;
+    let count = word(8);
+    let end = SRQ_HEADER_SIZE + count * SRQ_RECORD_SIZE;
+    let added = records.len() * SRQ_RECORD_SIZE;
+    out[..end].copy_from_slice(&data[..end]);
+    for (index, record) in records.iter().enumerate() {
+        let at = end + index * SRQ_RECORD_SIZE;
+        out[at..at + SRQ_RECORD_SIZE].copy_from_slice(record);
+    }
+    out[end + added..].copy_from_slice(&data[end..]);
+    out[8..12].copy_from_slice(&((count + records.len()) as u32).to_le_bytes());
+    // +0x20是音库路径偏移数组；第一条路径紧接数组，给出数组长度。
+    let banks = word(0x20);
+    let bank_count = (word(banks) - banks) / 4;
+    for i in 0..bank_count {
+        let at = banks + i * 4;
+        out[at + added..at + added + 4]
+            .copy_from_slice(&((word(at) + added) as u32).to_le_bytes());
+    }
+    for at in (0x20..=0x30).step_by(4) {
+        out[at..at + 4].copy_from_slice(&((word(at) + added) as u32).to_le_bytes());
+    }
 }
 
 /// XFS 解析后的 cFestaPelTiedSe 指针数组，不是序列化 PTS 文件布局。
@@ -129,12 +192,27 @@ impl<'a> SrqRecord<'a> {
     pub fn request_id(&self) -> u16 {
         u16::from_le_bytes(self.0[0..2].try_into().unwrap())
     }
+    pub fn set_request_id(&mut self, request: u16) {
+        self.0[..2].copy_from_slice(&request.to_le_bytes());
+    }
+    pub fn set_groups(&mut self, groups: [u16; 3]) {
+        for (index, group) in groups.into_iter().enumerate() {
+            let at = 0x0E + index * 2;
+            self.0[at..at + 2].copy_from_slice(&group.to_le_bytes());
+        }
+    }
+    pub fn set_concurrency_limit(&mut self, limit: u32) {
+        self.0[0x18..0x1C].copy_from_slice(&limit.to_le_bytes());
+    }
     pub fn set_volume(&mut self, volume: f32) {
         self.0[0x24..0x28].copy_from_slice(&volume.to_le_bytes());
         self.0[0x28..0x2C].copy_from_slice(&volume.to_le_bytes());
     }
     pub fn set_replay_interval(&mut self, interval: u16) {
         self.0[0x34..0x36].copy_from_slice(&interval.to_le_bytes());
+    }
+    pub fn set_start_delay(&mut self, delay: u32) {
+        self.0[0x30..0x34].copy_from_slice(&delay.to_le_bytes());
     }
     pub fn replace(&mut self, snapshot: &[u8; SRQ_RECORD_SIZE]) {
         self.0.copy_from_slice(snapshot);

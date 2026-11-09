@@ -3,6 +3,8 @@
 #![no_std]
 
 mod action;
+mod action_bridges;
+mod charge;
 mod config;
 mod config_file;
 #[path = "../../shared/config_io.rs"]
@@ -13,6 +15,7 @@ mod effect;
 mod hooks;
 mod gaxe;
 mod phial;
+mod phial_sound;
 #[path = "../../shared/patch.rs"]
 mod patch;
 mod preview;
@@ -22,6 +25,7 @@ mod runtime_hook;
 #[path = "../../shared/settings_menu.rs"]
 mod settings_menu;
 mod sound;
+mod sound_bridge;
 mod state;
 mod tasks;
 mod ui;

@@ -11,7 +11,7 @@ pub struct Plan {
 }
 
 /// 仅初始化 NRO 的返回槽，不写 main；也供主机测试检查开关组合。
-pub unsafe fn selected(_game_base: u32, config: &Config) -> Plan {
+pub unsafe fn selected(game_base: u32, config: &Config) -> Plan {
     let mut plan = Plan {
         words: Vec::new(),
         branches: Vec::new(),
@@ -19,11 +19,15 @@ pub unsafe fn selected(_game_base: u32, config: &Config) -> Plan {
     // 资源/动作注册与风格菜单常驻，功能总开关不影响这些公共内容。
     crate::style::collect(&mut plan.branches);
     if config.enabled {
+        if !config.styles.aed_recovery.is_empty() {
+            crate::recovery::collect(&mut plan.branches);
+        }
         unsafe { crate::moveset::collect(config, &mut plan.words, &mut plan.branches) };
         if !config.styles.guard_performance.is_empty() {
             crate::guard::collect(&mut plan.branches);
         }
         crate::saed::patches::collect(&config.saed, &mut plan.words);
+        unsafe { crate::instruction_hooks::collect(game_base, config, &mut plan.branches) };
     }
     plan
 }

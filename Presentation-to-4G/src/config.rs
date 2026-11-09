@@ -68,6 +68,8 @@ pub struct Config {
     pub burst: [TaskSettings; BURST_ACTION_TASKS.len()],
     // 保留既有任务数组和盾突持续时间的布局。
     pub four_g: FourGEffects,
+    pub mute_aed_phial_blood: bool,
+    pub phial_charge_cues: bool,
 }
 
 #[derive(Debug, PartialEq)]
@@ -89,6 +91,8 @@ impl Config {
         action: task_defaults(ACTION_TASKS),
         burst: task_defaults(BURST_ACTION_TASKS),
         four_g: FourGEffects::DEFAULT,
+        mute_aed_phial_blood: true,
+        phial_charge_cues: true,
     };
 
     pub fn parse(text: &str) -> Result<Self, ConfigError> {
@@ -137,6 +141,8 @@ impl Config {
                 ("sounds", "enabled") => config.sounds = boolean()?,
                 ("sounds", "patch_srq") => config.patch_srq = boolean()?,
                 ("sounds", "patch_pts") => config.patch_pts = boolean()?,
+                ("sounds", "mute_aed_phial_blood") => config.mute_aed_phial_blood = boolean()?,
+                ("sounds", "phial_charge_cues") => config.phial_charge_cues = boolean()?,
                 ("sounds", "volume_4a") => config.volume_4a = number(-96.0, 12.0)?,
                 ("effects", "enabled") => config.effects = boolean()?,
                 // 旧完整序列替换已撤去；读取旧键不再改变GU闪电，保存时移除。
@@ -192,6 +198,8 @@ impl Config {
                     ("sounds", "enabled") => Bool(self.sounds),
                     ("sounds", "patch_srq") => Bool(self.patch_srq),
                     ("sounds", "patch_pts") => Bool(self.patch_pts),
+                    ("sounds", "mute_aed_phial_blood") => Bool(self.mute_aed_phial_blood),
+                    ("sounds", "phial_charge_cues") => Bool(self.phial_charge_cues),
                     ("sounds", "volume_4a") => Float(self.volume_4a),
                     ("effects", "enabled") => Bool(self.effects),
                     ("4g_effects", "aed_explosion") => Bool(self.four_g.aed_explosion),

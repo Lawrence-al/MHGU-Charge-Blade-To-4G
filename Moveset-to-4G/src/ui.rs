@@ -52,15 +52,18 @@ fn draw_settings() {
                         &mut c.styles.guard_recoil_yellow,
                     ),
                     (c"Additional AED follow-ups", &mut c.styles.aed_followups),
+                    (c"Smooth axe recovery after AED", &mut c.styles.aed_recovery),
                 ] {
                     let mut enabled = set.contains(id as u16);
                     if imgui::checkbox(label, &mut enabled) {
                         set.set(id as u8, enabled);
                     }
                 }
-                imgui::text("All six settings apply to the selected style (0-7).");
+                imgui::text("All seven settings apply to the selected style (0-7).");
                 imgui::text("Defaults: yellow shield to AED in styles 3 and 6.");
                 imgui::text("GP recoil and guard in style 6; the other three settings are off.");
+                imgui::text("Smooth recovery defaults to off. Select a style to enable it.");
+                imgui::text("Recovery uses this style's Additional AED follow-ups when enabled.");
                 imgui::text(
                     "Yellow-shield routes need 'Yellow shield becomes normal AED' for normal AED.",
                 );
@@ -72,6 +75,10 @@ fn draw_settings() {
                     c.saed.effect_gear = gear as u8;
                 }
                 imgui::separator_text(c"Values");
+                let mut recovery_frames = i32::from(c.moveset.aed_recovery_frames);
+                if imgui::slider_int(c"AED recovery frames", &mut recovery_frames, 3, 120, ImGuiSliderFlags::None) {
+                    c.moveset.aed_recovery_frames = recovery_frames as u16;
+                }
                 imgui::checkbox(
                     c"Red / blue shield multiplier 1.2",
                     &mut c.moveset.shield_multiplier,

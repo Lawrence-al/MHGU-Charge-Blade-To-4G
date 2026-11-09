@@ -16,10 +16,9 @@ const POWER_SECOND: u32 = 0xE1A05000;
 const RANK_SITE: u32 = 0x002F0800;
 const RANK_ORIGINAL: u32 = 0xE3A08002;
 const RANK_SECOND: u32 = 0xE3500027;
-static mut POWER_CONTINUATION: u32 = 0;
+static mut POWER_ORIGINAL_ENTRY: u32 = 0;
 static mut RANK_CONTINUATION: u32 = 0;
 global_asm!(".hidden {slot}", slot = sym RANK_CONTINUATION);
-global_asm!(".hidden {slot}", slot = sym POWER_CONTINUATION);
 
 #[inline(never)]
 unsafe extern "C" fn guard_enabled(address: u32) -> u32 {
@@ -31,26 +30,12 @@ unsafe extern "C" fn guard_enabled(address: u32) -> u32 {
     })
 }
 
-/// 未启用当前风格时执行完整 GU 原函数：重放前两条后进入原函数 +8。
+/// 未启用当前风格时通过 Forge original 执行完整 GU 回调。
 /// GU 原函数会调用 +0x85C 的盾状态查询；不以字段推测替代这个虚调用。
-#[unsafe(naked)]
-unsafe extern "C" fn original_guard_power(_address: u32, _power: *mut u32) {
-    naked_asm!(
-        ".arm",
-        "push {{r4, r5, r11, lr}}",
-        "mov r5, r0",
-        "push {{r12, lr}}",
-        "ldr r12, 2f",
-        "3:",
-        "add r12, pc, r12",
-        "ldr r12, [r12]",
-        "str r12, [sp, #4]",
-        "pop {{r12, pc}}",
-        ".balign 4",
-        "2:",
-        ".word {slot} - (3b + 8)",
-        slot = sym POWER_CONTINUATION,
-    );
+unsafe extern "C" fn original_guard_power(address: u32, power: *mut u32) {
+    let original: unsafe extern "C" fn(u32, *mut u32) =
+        unsafe { core::mem::transmute(POWER_ORIGINAL_ENTRY as usize) };
+    unsafe { original(address, power) };
 }
 
 /// 阶段值可能留到下个动作，所以还要核对当前动画和通用防御有效位。
@@ -145,7 +130,8 @@ pub fn collect(branches: &mut Vec<BranchPatch>) {
         cheat_call: POWER_ORIGINAL,
         second: POWER_SECOND,
         target: guard_power as *const () as u32,
-        continuation: ptr::addr_of_mut!(POWER_CONTINUATION),
+        continuation: ptr::addr_of_mut!(POWER_ORIGINAL_ENTRY),
+        call_original: true,
     });
     branches.push(BranchPatch {
         offset: RANK_SITE,
@@ -154,5 +140,6 @@ pub fn collect(branches: &mut Vec<BranchPatch>) {
         second: RANK_SECOND,
         target: guard_rank_bridge as *const () as u32,
         continuation: ptr::addr_of_mut!(RANK_CONTINUATION),
+        call_original: false,
     });
 }

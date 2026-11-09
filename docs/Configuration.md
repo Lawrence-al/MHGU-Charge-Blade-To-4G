@@ -2,7 +2,7 @@
 
 现行构建只有 Presentation 和 Moveset 两个 NRO。4G菜单及新动作已合并到Moveset；旧Style NRO需要停用，旧源码保留作历史参考。
 
-INI唯一位置是MHGU当前用户的存档根目录：`cb_presentation_to_4g.ini`、`cb_moveset_to_4g.ini`。默认模板在项目`conf/`中，首次运行生成。Forge菜单和手动编辑读写同一份文件；功能设置保存后重启应用。原版风格菜单的4G选择即时应用并保存。
+INI文件名为 `cb_presentation_to_4g.ini` 和 `cb_moveset_to_4g.ini`。启动时自动识别文件接口，Switch和Ryujinx使用当前用户存档根目录，三套重编译使用 `romfs/nativeNX/plugins/`。菜单显示读取路径，保存写回同一位置。原版通过SDK存档挂载和提交读写，重编译通过ImGui宿主文件桥读写。默认模板在项目 `conf/` 中，部署时为缺少的plugins INI提供默认文件。功能设置保存后重启，原版风格菜单的4G选择即时应用并保存。
 
 ## 公共资源始终加载
 
@@ -12,7 +12,7 @@ Hitdata关闭时保留加载文件的前80条；开启且插件总开关开启�
 
 ## 按风格编号配置
 
-六个功能只用`[styles]`中的编号集合控制，各自没有第二个功能总开关。只保留0..7八个编号。黄盾变正常AED默认选武士道3和4G6，GP后退/防性默认只选6，新增后三项默认none；`[plugin] enabled`仍是整个插件战斗功能的总开关。
+七个功能使用`[styles]`中的编号集合控制，界面提供0..7八个编号。黄盾变正常AED默认选武士道3和4G6，GP后退/防性默认只选6，平滑收斧、盾突/防御后黄盾和大解额外派生默认none。`[plugin] enabled`控制整个插件的战斗功能。
 
 | 编号 | 风格 |
 |---|---|
@@ -33,13 +33,14 @@ guard_performance = 6
 shield_thrust_yellow = none
 guard_recoil_yellow = none
 aed_followups = none
+aed_recovery = none
 ```
 
 支持`all`、`none`、`0,2,4,6`、`0-7`、`all,!3`。all只包含这八个编号；8及以上会报配置错误，不增加菜单选项。例如`shield_thrust_yellow = 6,7`只选择4G和预留编号，none关闭该功能。GP后退或防性列表为none时，不安装相应桥接。
 
-Forge菜单上方的“Moveset”提供0–7的Style ID选择器和六项复选框，勾选直接添加当前编号，取消直接移除；J guard是独立全局开关，默认开启。4G选择只在本机公会盾斧上映射为6，远端公会仍按0处理。
+Forge菜单上方的“Moveset”提供0–7的Style ID选择器和七项复选框，勾选直接添加当前编号，取消直接移除；J guard是独立全局开关，默认开启。4G选择只在本机公会盾斧上映射为6，远端公会仍按0处理。
 
-菜单及保存后的INI均按“Moveset派生/风格 → SAED → 数值”排列。数值区包含盾补正、固定震动和Hitdata。已有明确填写的列表保留；要应用新的默认值，在Forge菜单点击Defaults、Save INI，再重启游戏。
+菜单及保存后的INI均按“Moveset派生/风格 → SAED → 数值”排列。数值区包含收斧时长、盾补正、固定震动和Hitdata。已有明确填写的列表保留；新收斧键缺省时仅启用6、时长20。保存菜单后重启应用。
 
 `0x44/0x4B`是原黄盾前置动作。盾突、J guard或防御后路由仅改变它们的入口，不能独自变成普通AED。还需为同一风格勾选“Yellow shield becomes normal AED”，才把0x44/0x4B转成新增0xAA/0xAB；之后由原盾状态/有瓶判定进入普通大解或超解。
 
@@ -54,11 +55,13 @@ Forge菜单上方的“Moveset”提供0–7的Style ID选择器和六项复选�
 | `[styles] shield_thrust_yellow` | none | 所选风格盾突链0x7FA第1条X+A接黄盾0x44，保留窗口；强袭原链为空，不新增盾突动作 |
 | `[styles] guard_recoil_yellow` | none | 所选风格小退0x802/中退0x803后追加X+A接黄盾0x4B；原表全部保留，大退不添加 |
 | `[styles] aed_followups` | none | 仅所选风格保留原大解及红盾取消命令，再追加本风格0x7DC第1条起的派生，排除第0条弹刀 |
+| `[styles] aed_recovery` | none | 默认关闭。启用后普通大解结束进入同一action的state2，平滑归中至斧待机，延续已配置额外派生，混合完成后切待机 |
 | `[moveset] j_guard_aed` | true | J guard X+A接黄盾；仅武士道J防成功链0x81A第3条接0x44，Pre20/Start30/End0保持 |
 | `[hitdata] enabled` | true | 覆盖前80条的独立开关，不控制新增0x50 |
 | `[style] selected` | false | 原版菜单选择4G时自动保存；不作为额外战斗补丁开关 |
 | `[values] shield_multiplier` | true | 红/蓝盾补正档位统一2，即1.2；黄盾档位0，即1.0。对新增风格也生效 |
 | `[values] aed_camera_shake` | true | 大解瓶爆震动从15改为固定20，仅提供启停 |
+| `[values] aed_recovery_frames` | 20 | 3..120个游戏动画计时单位；越大收斧越慢，仅对aed_recovery所选风格有效，不改变攻击帧与红盾窗口 |
 
 GP判断仍核对`+0x333C=1`、`+0x2510&0x10`和实际GP动画，不依赖后退会取消的`+0x3340&0x20`。普通防御及遗留阶段不会得到额外GP减值。
 
@@ -84,6 +87,8 @@ GP判断仍核对`+0x333C=1`、`+0x2510&0x10`和实际GP动画，不依赖后退
 | Shield thrust X+A to yellow shield | 盾突X+A接黄盾0x44 |
 | Guard recoil (small/medium) X+A to yellow shield | 防御小退/中退后X+A接黄盾0x4B |
 | Additional AED follow-ups | 大解额外派生 |
+| Smooth axe recovery after AED | 当前风格的大解平滑收斧 |
+| AED recovery frames | 收斧时长，位于数值区 |
 | J guard X+A to yellow shield | J防成功后X+A接黄盾0x44，独立全局开关 |
 
 ## SAED保持全局开关
@@ -94,9 +99,9 @@ enabled = true
 effect_gear = 2
 ```
 
-按用户最后确认，SAED不再按风格拆分。开启时原21处补丁与三个瓶爆钩子同时启用；关闭时用原游戏/SH逻辑，但HDP仍始终81条。
+按用户最后确认，SAED不再按风格拆分。开启时六个指令等效内部Hook与三个瓶爆钩子同时启用；关闭时用原游戏/SH逻辑，但HDP仍始终81条。原21处改值仅保留为GU/旧金手指的兼容签名，正常安装不再直接写入这些指令和常量。
 
-- 第三hit：地面调用0x50、空中调用0x23；后续帧常量108改109；不改原0x4F调用。
+- 第三hit：地面调用0x50、空中调用0x23；在两个VLDR读取点改从NRO读取109，不写main的108常量；不改原0x4F调用。
 - 瓶伤：固定原金手指系数1.35，精确字节0x3FACCCCC。
 - 榴弹：首爆等待0、前方270；之后间隔9、每爆前进100。
 - 强属性：首爆等待46、前方300，后续1/2/3/4点扇形；相对时间0/18/20/38/40/42/58/60/62/64。
@@ -106,6 +111,10 @@ effect_gear = 2
 完整时序见[SAED](SAED.md)。默认模板已为每个开关列出具体涉及的动作、字段和补丁。
 
 ## Presentation
+
+`[sounds] phial_charge_cues=true`（默认）在实际剑能量跨过黄色30／红色46时提示一次。独立的0x57请求从原0x4D复制，音量为0dB，延迟0ms，较此前版本提高3.7dB。一次增量直接跨两档时提示最终红色。菜单为“4G yellow / red phial charge cues”，设置保存后重启生效。
+
+`[sounds] mute_aed_phial_blood=true`（默认）过滤盾突、一二解、大解及超解瓶爆的公共飙血请求0x82/83/84。直接来源必须是shell，且对象为Shell002或Shell003。菜单名称为“Mute phial blood sound”，INI继续使用原键名，设置保存后重启生效。
 
 原有音效、GU盾牌闪电和任务时序设置保持原含义。六项4G视觉独立启停：
 
@@ -128,4 +137,4 @@ saed_blast = false
 - 菜单顺序为4G特效、GU lightning、Sound；action/burst条目按用途显示在GU或Sound下，仍读写原任务编号。
 - 旧`use_4g_sequences/aed_4g_duration/saed_4g_duration`读取兼容但无效，保存移除。原GU action/burst时长仍保留。
 
-此前错误的独立002命中/104砸地功能未恢复；002仅作为本轮要求的瓶附加，首爆时立即结束。旧INI的[impacts]两键仅读取兼容，保存移除。005使用真实命中/PSL地面请求，103仅在有瓶超解砸下创建。后段使用独立三资源overlay，29项完整预览包不改，均内嵌NRO。菜单保存到同一存档根目录INI，重启后应用。详见[事件及停止修正](2026-10-24_逆向-005103事件与002首爆停止-report.md)。
+002用于瓶附加，首爆时立即结束。旧INI的[impacts]两键仅读取兼容，保存移除。005使用真实命中/PSL地面请求，103仅在有瓶超解砸下创建。后段使用独立三资源overlay，29项完整预览包均内嵌NRO。菜单写回当前环境选定的同一INI，重启后应用。详见[事件及停止修正](2026-10-24_逆向-005103事件与002首爆停止-report.md)。

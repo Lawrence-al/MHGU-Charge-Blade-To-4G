@@ -38,8 +38,13 @@ function verifyTables() {
     const source = fs.readFileSync(path.join(root, 'Moveset-to-4G/src', file), 'utf8');
     const rows = [...source.matchAll(/\((0x[0-9A-F]+), (0x[0-9A-F]+), (0x[0-9A-F]+)\)/g)].map(m => m.slice(1).map(Number));
     assert.deepEqual(rows.map(([offset, , value]) => [offset, value]), expected);
-    all.push(...rows.map(([offset]) => [offset, 4]), ...branches);
+    all.push(...branches);
   }
+  // 旧24处改值仅作为兼容签名；真实写入为9个标准内部Hook，不再改literal pool。
+  const numeric=fs.readFileSync(path.join(root,'Moveset-to-4G/src/instruction_hooks.rs'),'utf8');
+  const numericSites=[...numeric.matchAll(/push\(\s*branches,\s*(0x[0-9A-F]+)/g)].map(m=>Number(m[1]));
+  assert.deepEqual(numericSites,[0x011DF8B0,0x011DF8D0,0x0048859C,0x011DADD4,0x011DBDA0,0x011DADA0,0x011DBD54,0x0048906C,0x011DE838]);
+  all.push(...numericSites.map(site=>[site,8]));
   for (const project of ['Presentation-to-4G', 'Moveset-to-4G']) {
     const activeSource = fs.readFileSync(path.join(root, project, 'src/hooks.rs'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
     const hooks = [...activeSource.matchAll(/cb_hook!\s*\{\s*(0x[0-9A-F]+)/g)].map(m => [Number(m[1]), 8]);
@@ -53,7 +58,17 @@ function verifyTables() {
   const phialOffsets = [...phial.matchAll(/offset:\s*(0x[0-9A-F]+)/g)].map(m=>Number(m[1]));
   assert.deepEqual(phialOffsets,[0x00488358,0x004886EC,0x00488654]);
   all.push(...phialOffsets.map(offset=>[offset,8]));
+  const action = fs.readFileSync(path.join(root, 'Presentation-to-4G/src/action_bridges.rs'), 'utf8');
+  const actionOffsets = [...action.matchAll(/offset:\s*(0x[0-9A-F]+)/g)].map(m => Number(m[1]));
+  assert.deepEqual(actionOffsets, [0x011DABD0, 0x011DE7EC]);
+  all.push(...actionOffsets.map(offset => [offset, 8]));
   const styleMenu = require('./style-menu-fixtures');
+  const recovery = fs.readFileSync(path.join(root, 'Moveset-to-4G/src/recovery.rs'), 'utf8');
+  const recoveryHooks = [...recovery.matchAll(/cb_hook!\s*\{\s*(0x[0-9A-F]+)/g)].map(m=>[Number(m[1]),8]);
+  assert.deepEqual(recoveryHooks,[[0x002E9D54,8]]);
+  assert.ok(recovery.includes('const DISPATCH_SITE: u32 = 0x011D6914;'));
+  assert.ok(recovery.includes('const END_SITE: u32 = 0x011DAD48;'));
+  all.push([0x011D6914,8],[0x011DAD48,8],...recoveryHooks);
   all.push(...styleMenu.branches.map(([offset]) => [offset, 8]), [0x011D5C64, 8]);
   for (const file of ['actions.rs', 'menu.rs']) {
     const source = fs.readFileSync(path.join(root, 'Moveset-to-4G/src/style', file), 'utf8');
@@ -70,7 +85,7 @@ function verifyTables() {
   assert.equal(target(0x011DADE4, 0xEBC37115), 0x002B7240);
   assert.equal(target(0x011DBDB0, 0xEBC36D22), 0x002B7240);
   for (const removed of [0x00043FF4,0x009BA5B0,0x00A5B558,0x011DA634,0x011DA5EC,0x011DA610,0x011DA5C0,0x011DA43C,0x011DA4B8,0x011DA4C0,0x011DB014, 0x00488F5C, 0x00488F74, 0x011DE158, 0x011DB498, 0x011DACF0, 0x011DAF74, 0x011DB0B4, 0x011DB0FC, 0x002EA864, 0x011DEA04]) assert.ok(all.every(([address]) => address !== removed));
-  console.log('PASS: 24 direct values, HDP 0x50/0x23 calls, two cb_ NRO formats; no overlapping hooks/branches, codecave writes or retired yellow-shield patches');
+  console.log('PASS: 24 legacy signatures replaced by 9 standard inline hooks, HDP 0x50/0x23 calls, two cb_ NRO formats; no overlapping hooks, codecave writes or retired yellow-shield patches');
   loadPlugin(path.join(root, 'Presentation-to-4G'), 'presentation_to_4g');
   loadPlugin(path.join(root, 'Moveset-to-4G'), 'moveset_to_4g');
   assert.deepEqual(fs.readdirSync(path.join(root, 'dist')).filter(name => name.endsWith('.nro')).sort(), ['cb_moveset_to_4g.nro', 'cb_presentation_to_4g.nro']);

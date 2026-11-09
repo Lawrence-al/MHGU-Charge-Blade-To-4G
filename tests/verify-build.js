@@ -73,6 +73,11 @@ for (let i = 0; i < dynsym.size; i += dynsym.stride) {
 const exportedNames = symbols.filter(s => s.defined && s.bind !== 0).map(s => s.name);
 const required = ['init', 'fini', 'forge_onLoad', 'forge_onInit', 'forge_onImGuiRender'];
 for (const name of required) assert.ok(exportedNames.includes(name), 'missing callback: ' + name);
+const imports = symbols.filter(s => !s.defined && s.bind === 1).map(s => s.name);
+for (const name of ['forge_fs_mountSaveData','forge_fs_unmountSaveData','_ZN2nn2fs14CommitSaveDataEPKc','igImFileOpen','igImFileClose','igImFileGetSize','igImFileRead','igImFileWrite']) assert.ok(imports.includes(name), 'missing automatic-storage API: ' + name);
+assert.ok(nro.includes(Buffer.from('app:/nativeNX/plugins/cb_' + stem + '.ini')), 'plugins INI path missing');
+assert.ok(nro.includes(fs.readFileSync(path.join(root, 'conf', 'cb_' + stem + '.ini'))), 'embedded default INI differs from conf');
+assert.ok(nro.includes(Buffer.from('savedata:/cb_' + stem + '.ini')), 'native save INI path missing');
 
 // 无游戏文件时仍检查完整 ELF/NRO；传入两个路径可额外核对真实导出和原指令。
 if (!runtimePath) {
@@ -100,7 +105,6 @@ for (let i = 0; i < u32(memory, tags[4] + 4); i++) {
   const o = tags[6] + 16 * i;
   if (memory.readUInt16LE(o + 14) !== 0) runtimeSymbols.push({ name: string(runtimeNames, u32(memory, o)), value: u32(memory, o + 4) });
 }
-const imports = symbols.filter(s => !s.defined && s.bind === 1).map(s => s.name);
 // Forge API 由当前 subsdk9 导出；SDK / malloc 等由原游戏 main 和 sdk 导出。
 // 伤害显示插件没有这些分配器依赖，CB 的 Vec / Mutex 必须按完整进程核对。
 const providers = new Map(runtimeSymbols.map(s => [s.name, 'installed Forge']));

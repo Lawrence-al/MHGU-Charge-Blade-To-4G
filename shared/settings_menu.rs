@@ -1,4 +1,4 @@
-//! 编辑草稿与战斗中生效的不可变配置分开；只在点击保存时写存档根目录。
+//! 编辑草稿与战斗配置分开，保存结果由plugins配置存储返回。
 use crate::config_io::Location;
 use core::cell::UnsafeCell;
 use forge::{
@@ -43,7 +43,7 @@ pub fn footer<C: Copy + PartialEq>(
 ) {
     imgui::separator();
     imgui::text("Save changes to INI, then restart the game to apply.");
-    imgui::text(location.display);
+    imgui::text(location.display());
     if edit.draft != edit.saved {
         imgui::text("Unsaved changes.");
     }

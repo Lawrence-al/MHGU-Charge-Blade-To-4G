@@ -276,6 +276,11 @@ impl WeaponEffectShell {
         self.0
     }
 
+    /// 00487EC8构造的uShellPlw14_002，供盾突、一二解及大解瓶爆共用。
+    pub unsafe fn is_instance(self, game: Game) -> bool {
+        unsafe { memory::read_u32(self.0) == game.address(0x01762DB4) }
+    }
+
     pub unsafe fn create_defined(
         self,
         game: Game,
@@ -320,6 +325,15 @@ impl WeaponEffectShell {
     pub unsafe fn process_type(self) -> u8 {
         let setup = unsafe { memory::read_u32(self.0 + 0x136C) };
         unsafe { memory::read_u8(setup + 8) }
+    }
+
+    /// 原生瓶爆逐帧更新后的世界坐标；发声入口同步复制前三个浮点数。
+    pub const fn position_address(self) -> u32 {
+        self.0 + 0x40
+    }
+
+    pub unsafe fn room(self) -> u32 {
+        unsafe { memory::read_u8(self.0 + 0x1054) as u32 }
     }
 
     pub unsafe fn owner(self) -> crate::player::ChargeBladePlayer {

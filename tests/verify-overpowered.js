@@ -58,9 +58,10 @@ pub mod log{pub mod prelude{pub use crate::error;}}
 mod overpowered{pub fn init(){crate::event("overpowered::init");}}
 mod phial{pub fn init(){crate::event("phial::init");}}
 mod style{pub fn enable(_:u32){crate::event("style::enable");}}
+mod recovery{pub fn enable(_:u32){crate::event("recovery::enable");}}
 ${enable}
 fn main(){
- for bits in 0..1024{
+ for bits in 0..2048{
   let mut c=Config::DEFAULT;
   let set=|on|if on{config::StyleSet::FOUR_G}else{config::StyleSet::NONE};
   c.enabled=bits&1!=0;c.styles.aed_followups=set(bits&2!=0);c.hitdata=bits&4!=0;c.saed.enabled=bits&8!=0;
@@ -68,13 +69,15 @@ fn main(){
   c.styles.gp_recoil=if bits&32!=0{config::StyleSet::FOUR_G}else{config::StyleSet::NONE};c.moveset.j_guard_aed=bits&64!=0;
   c.styles.shield_thrust_yellow=set(bits&128!=0);c.moveset.aed_camera_shake=bits&256!=0;
   c.styles.guard_recoil_yellow=set(bits&512!=0);
+  c.styles.aed_recovery=set(bits&1024!=0);
   EVENTS.with(|e|e.borrow_mut().clear());enable(0x60000000,&c);
   let mut expected=vec!["style::enable"];
+  if c.enabled&&!c.styles.aed_recovery.is_empty(){expected.push("recovery::enable");}
   if c.enabled&&(!c.styles.aed_followups.is_empty()||!c.styles.guard_recoil_yellow.is_empty()){expected.extend(["overpowered::init","hook_move_chain_init"]);}
   if c.needs_hitdata(){expected.push("hook_hitdata_load");}
   if c.needs_phial(){expected.extend(["phial::init","hook_saed_shell_init","hook_saed_shell_update","hook_saed_shell_destruct"]);}
   EVENTS.with(|e|assert_eq!(*e.borrow(),expected,"bits={bits}"));
  }
- println!("PASS: 1024 actual hook-selection combinations; AED/guard lists share one InitMoveChain hook, empty groups install none");
+ println!("PASS: 2048 actual hook-selection combinations; AED/guard share one InitMoveChain hook, recovery has its own switch, empty groups install none");
 }
 `);

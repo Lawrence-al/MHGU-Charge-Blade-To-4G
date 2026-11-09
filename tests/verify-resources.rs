@@ -1,4 +1,19 @@
 // 用 dump 原版和 asset 改版核对实际 Rust 修改函数，不运行游戏或 Forge。
+extern crate self as forge;
+#[macro_export]
+macro_rules! error { ($($arg:tt)*) => { eprintln!($($arg)*); }; }
+pub mod log { pub mod prelude { pub use crate::error; } }
+#[allow(dead_code)]
+#[path = "../Presentation-to-4G/src/charge.rs"]
+mod charge;
+#[allow(dead_code)]
+#[path = "../Presentation-to-4G/src/phial_sound.rs"]
+mod phial_sound;
+mod state {
+    pub struct State;
+    pub static STATE: State = State;
+    impl State { pub fn game(&self) -> cb_game::Game { unreachable!("pure resource comparison") } }
+}
 #[allow(dead_code)]
 mod resource {
     include!("../Presentation-to-4G/src/resource.rs");

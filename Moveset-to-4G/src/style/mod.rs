@@ -1,4 +1,4 @@
-//! 共用动作和菜单始终安装；六项派生／防御修改按当前风格查询固定配置。
+//! 共用动作和菜单始终安装；派生／防御／恢复修改按当前风格查询固定配置。
 pub mod actions;
 pub mod menu;
 pub mod selection;
@@ -15,6 +15,7 @@ pub enum Feature {
     ShieldThrustYellow,
     GuardRecoilYellow,
     AedFollowups,
+    AedRecovery,
 }
 
 /// 4G 菜单选择在本机公会资源上运行；其余编号按装备原字段完整读取。
@@ -44,6 +45,7 @@ pub unsafe fn enabled_for(player: ChargeBladePlayer, feature: Feature) -> bool {
         Feature::ShieldThrustYellow => config.styles.shield_thrust_yellow.contains(id),
         Feature::GuardRecoilYellow => config.styles.guard_recoil_yellow.contains(id),
         Feature::AedFollowups => config.styles.aed_followups.contains(id),
+        Feature::AedRecovery => config.styles.aed_recovery.contains(id),
     }
 }
 

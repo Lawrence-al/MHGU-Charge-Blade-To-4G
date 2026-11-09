@@ -79,6 +79,7 @@ pub struct StylesConfig {
     pub shield_thrust_yellow: StyleSet,
     pub guard_recoil_yellow: StyleSet,
     pub aed_followups: StyleSet,
+    pub aed_recovery: StyleSet,
 }
 
 impl StylesConfig {
@@ -89,5 +90,6 @@ impl StylesConfig {
         shield_thrust_yellow: StyleSet::NONE,
         guard_recoil_yellow: StyleSet::NONE,
         aed_followups: StyleSet::NONE,
+        aed_recovery: StyleSet::NONE,
     };
 }

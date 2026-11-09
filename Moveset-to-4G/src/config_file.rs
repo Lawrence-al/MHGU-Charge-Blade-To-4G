@@ -1,4 +1,4 @@
-// 手动编辑与菜单保存均使用 MHGU 存档根目录；战斗期间的配置在启动时固定。
+// 手动编辑与菜单保存均使用nativeNX/plugins，战斗期间的配置在启动时固定。
 use crate::{config::Config, config_io};
 use core::cell::UnsafeCell;
 use forge::os::sync::{LazyLock, Mutex, OnceLock, ScopedLock};

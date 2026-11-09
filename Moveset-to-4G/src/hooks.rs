@@ -55,6 +55,9 @@ fn hook_move_chain_init(player: u32, chain: u32, start_frame: i32) -> u32, |orig
 
 pub fn enable(game_base: u32, config: &Config) {
     crate::style::enable(game_base);
+    if config.enabled && !config.styles.aed_recovery.is_empty() {
+        crate::recovery::enable(game_base);
+    }
     if config.enabled
         && (!config.styles.aed_followups.is_empty()
             || !config.styles.guard_recoil_yellow.is_empty())

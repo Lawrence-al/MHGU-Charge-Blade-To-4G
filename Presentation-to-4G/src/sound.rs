@@ -1,6 +1,20 @@
 //! SE 提交和 MSS 拦截规则；原生音序字段及播放池调用在 cb-game。
 use crate::{action, state::STATE};
-use cb_game::sound::{SeRequest, SoundSequence};
+use cb_game::sound::{HitSoundSource, SeRequest, SoundSequence, submit_common_hit};
+
+/// 仅001808CC桥接的公共血声层进入这里；保留D8分支落点，安装时判断独立开关。
+/// 按直接来源的Shell002/003识别盾斧瓶爆，支持玩家动作结束后的迟发命中。
+pub unsafe extern "C" fn submit_hit_blood(
+    manager: u32, request: u32, position: u32, room: u32, attack: u32,
+) -> u32 {
+    let game = STATE.game();
+    if (0x82..=0x84).contains(&request)
+        && unsafe { HitSoundSource::from_attack(attack).is_charge_blade_phial(game) }
+    {
+        return 0;
+    }
+    unsafe { submit_common_hit(game, manager, request, position, room) }
+}
 
 pub unsafe fn play_se_ex(request_id: u16, bank: u16, attach_index: i32, pool_path: u32) -> bool {
     let owner = unsafe { STATE.resolve_owner() };

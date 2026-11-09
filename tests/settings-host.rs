@@ -7,7 +7,7 @@ struct Storage {
     reads: usize, writes: usize, closes: usize, mounts: usize,
     active_mounts: usize, handles: usize, commits: usize, commit_error: bool,
     open_error: bool, read_error: bool, size_error: bool, write_error: bool, create_error: bool,
-    negative_size: bool, mount_error: bool,
+    negative_size: bool, mount_error: bool, indexed: bool, close_error: bool,
 }
 thread_local! { static STORAGE: RefCell<Storage> = RefCell::new(Storage::default()); }
 #[macro_export] macro_rules! error { ($($arg:tt)*) => {{ let _ = format!($($arg)*); }}; }
@@ -31,81 +31,117 @@ pub mod sys { pub mod imgui {
     pub struct ImGuiInputTextFlags; impl ImGuiInputTextFlags { pub const None: Self = Self; }
 } }
 fn path_text(p: *const c_char) -> String { unsafe { CStr::from_ptr(p) }.to_str().unwrap().to_owned() }
-fn saved_path() -> String { LOCATION.path.to_str().unwrap().to_owned() }
+fn mode() -> String { std::env::args().nth(1).unwrap_or_else(|| "native".into()) }
+fn recompiled() -> bool { mode().starts_with("recompiled") }
+fn probe_handle() -> usize { match mode().as_str() { "recompiled-last"=>32, "recompiled"=>1, "native-page"=>0x1000, _=>0xF8200000 } }
+fn saved_path() -> String { (if recompiled(){LOCATION.plugin_path}else{LOCATION.save_path}).to_str().unwrap().to_owned() }
+static PROBE_OPENS:std::sync::atomic::AtomicUsize=std::sync::atomic::AtomicUsize::new(0);
+static PROBE_CLOSES:std::sync::atomic::AtomicUsize=std::sync::atomic::AtomicUsize::new(0);
+fn check_backend() -> bool {
+    if mode()=="probe-error" {
+        let mut bytes=[0;8192];assert!(LOCATION.read(&mut bytes).is_err());assert!(LOCATION.save("config").is_err());
+        assert!(LOCATION.path().is_err());assert_eq!(PROBE_OPENS.load(std::sync::atomic::Ordering::Relaxed),1);
+        STORAGE.with(|s|{let s=s.borrow();assert_eq!((s.mounts,s.writes,s.handles),(0,0,0));});println!("PASS: unavailable backend performs no configuration I/O");return false;
+    }
+    for _ in 0..20 {assert_eq!(LOCATION.path().unwrap().to_str().unwrap(),saved_path());assert_eq!(LOCATION.display(),saved_path());}
+    assert_eq!(PROBE_OPENS.load(std::sync::atomic::Ordering::Relaxed),1);
+    assert_eq!(PROBE_CLOSES.load(std::sync::atomic::Ordering::Relaxed),1);
+    if recompiled() {
+        let mut bytes=[0;8192];assert_eq!(LOCATION.read(&mut bytes).unwrap(),LOCATION.defaults);
+        assert!(LOCATION.save("config").is_err());
+        STORAGE.with(|s|{let s=s.borrow();assert!(s.files.is_empty());assert_eq!((s.mounts,s.writes,s.handles),(0,0,0));});
+    }
+    true
+}
 fn file_bytes(bytes: &[u8]) {
-    STORAGE.with(|s| { *s.borrow_mut() = Storage::default(); s.borrow_mut().files.insert(saved_path(),bytes.to_vec()); });
+    STORAGE.with(|s| {let mut s=s.borrow_mut();*s=Storage::default();s.indexed=true;s.files.insert(saved_path(),bytes.to_vec());});
 }
-#[unsafe(export_name = "forge_fs_mountSaveData")]
-extern "C" fn mount() -> bool {
-    STORAGE.with(|s| { let mut s = s.borrow_mut(); s.mounts += 1;
-        if s.mount_error {false} else {s.active_mounts+=1;true} })
+#[unsafe(export_name="forge_fs_mountSaveData")]
+extern "C" fn mount()->bool {
+    assert!(!recompiled(),"recompiled config must not touch the save mount");
+    STORAGE.with(|s|{let mut s=s.borrow_mut();s.mounts+=1;if s.mount_error{false}else{s.active_mounts+=1;true}})
 }
-#[unsafe(export_name = "forge_fs_unmountSaveData")]
-extern "C" fn unmount() {
-    STORAGE.with(|s| {let mut s=s.borrow_mut();assert_eq!(s.handles,0);assert!(s.active_mounts>0);s.active_mounts-=1;});
+#[unsafe(export_name="forge_fs_unmountSaveData")]
+extern "C" fn unmount(){STORAGE.with(|s|{let mut s=s.borrow_mut();assert_eq!(s.handles,0);assert!(s.active_mounts>0);s.active_mounts-=1;});}
+#[unsafe(export_name="_ZN2nn2fs14CommitSaveDataEPKc")]
+extern "C" fn commit(name:*const c_char)->u32 {
+    assert_eq!(path_text(name),"savedata");STORAGE.with(|s|{let mut s=s.borrow_mut();assert_eq!(s.handles,0);assert!(s.active_mounts>0);s.commits+=1;u32::from(s.commit_error)})
 }
-#[unsafe(export_name = "_ZN2nn2fs14CommitSaveDataEPKc")]
-extern "C" fn commit(name: *const c_char) -> u32 {
-    assert_eq!(path_text(name),"savedata");STORAGE.with(|s|{let mut s=s.borrow_mut();
-        assert_eq!(s.handles,0);assert!(s.active_mounts>0);s.commits+=1;u32::from(s.commit_error)})
+#[unsafe(export_name="_ZN2nn2fs8OpenFileEPNS0_10FileHandleEPKci")]
+extern "C" fn open(handle:*mut u32,path:*const c_char,mode:i32)->u32 {
+    assert!(!recompiled(),"recompiled configs use ImFile, not the SDK RomFS interface");
+    assert!(path_text(path).starts_with("savedata:/"),"SDK write-open on app:/ causes the reported Abort");
+    assert_eq!(path_text(path),saved_path());assert!([1,6].contains(&mode));
+    STORAGE.with(|s|{let mut s=s.borrow_mut();assert_eq!(s.active_mounts,1);
+        if s.open_error{1}else if !s.files.contains_key(&saved_path()){0x202}else{s.handles+=1;unsafe{*handle=if mode==1{0x11}else{0x22}};0}})
 }
-#[unsafe(export_name = "_ZN2nn2fs8OpenFileEPNS0_10FileHandleEPKci")]
-extern "C" fn open(handle: *mut u32, path: *const c_char, mode: i32) -> u32 {
-    assert_eq!(path_text(path), saved_path()); assert!([1,6].contains(&mode));
-    STORAGE.with(|s| {
-        let mut s = s.borrow_mut();assert!(s.active_mounts>0);
-        if s.open_error {1} else if !s.files.contains_key(&saved_path()) {0x202}
-        else {s.handles+=1; unsafe { *handle = if mode==1 {0x11} else {0x22} }; 0 }
-    })
+#[unsafe(export_name="_ZN2nn2fs10CreateFileEPKcx")]
+extern "C" fn create(path:*const c_char,size:i64)->u32 {
+    assert_eq!(size,0);assert!(!recompiled());assert_eq!(path_text(path),saved_path());
+    STORAGE.with(|s|{let mut s=s.borrow_mut();if s.create_error{1}else{s.files.insert(saved_path(),Vec::new());0}})
 }
-#[unsafe(export_name = "_ZN2nn2fs10CreateFileEPKcx")]
-extern "C" fn create(path: *const c_char, size: i64) -> u32 {
-    assert_eq!(size, 0);
-    STORAGE.with(|s| {
-        let mut s = s.borrow_mut();
-        if s.create_error { 1 } else { s.files.insert(path_text(path), Vec::new()); 0 }
-    })
+#[unsafe(export_name="_ZN2nn2fs11GetFileSizeEPxNS0_10FileHandleE")]
+extern "C" fn get_size(size:*mut i64,handle:u32)->u32 {
+    assert_eq!(handle,0x11);STORAGE.with(|s|{let s=s.borrow();if s.size_error{return 1;}unsafe{*size=if s.negative_size{-1}else{s.files[&saved_path()].len() as i64}};0})
 }
-#[unsafe(export_name = "_ZN2nn2fs11GetFileSizeEPxNS0_10FileHandleE")]
-extern "C" fn get_size(size: *mut i64, handle: u32) -> u32 {
-    assert_eq!(handle,0x11);
-    STORAGE.with(|s| {
-        let s=s.borrow(); if s.size_error {return 1;}
-        unsafe { *size=if s.negative_size {-1} else {s.files[&saved_path()].len() as i64}; } 0
-    })
+#[unsafe(export_name="_ZN2nn2fs8ReadFileENS0_10FileHandleExPvj")]
+extern "C" fn read(handle:u32,offset:i64,bytes:*mut c_void,size:usize)->u32 {
+    assert_eq!((handle,offset),(0x11,0));STORAGE.with(|s|{let mut s=s.borrow_mut();s.reads+=1;if s.read_error{1}else{unsafe{std::slice::from_raw_parts_mut(bytes.cast::<u8>(),size)}.copy_from_slice(&s.files[&saved_path()]);0}})
 }
-#[unsafe(export_name = "_ZN2nn2fs8ReadFileENS0_10FileHandleExPvj")]
-extern "C" fn read(handle:u32, offset:i64, bytes:*mut c_void, size:usize)->u32 {
-    assert_eq!(handle,0x11); assert_eq!(offset,0);
-    STORAGE.with(|s| {
-        let mut s=s.borrow_mut();s.reads+=1;
-        if s.read_error {1} else {
-            unsafe {std::slice::from_raw_parts_mut(bytes.cast::<u8>(),size)}.copy_from_slice(&s.files[&saved_path()]); 0
-        }
-    })
+#[unsafe(export_name="_ZN2nn2fs11SetFileSizeENS0_10FileHandleEx")]
+extern "C" fn set_size(handle:u32,size:i64)->u32 {
+    assert_eq!(handle,0x22);STORAGE.with(|s|{let mut s=s.borrow_mut();if s.size_error{1}else{s.files.get_mut(&saved_path()).unwrap().resize(size as usize,0);0}})
 }
-#[unsafe(export_name = "_ZN2nn2fs11SetFileSizeENS0_10FileHandleEx")]
-extern "C" fn set_size(handle: u32, size: i64) -> u32 {
-    assert_eq!(handle, 0x22);
-    STORAGE.with(|s| {
-        let mut s = s.borrow_mut();
-        if s.size_error { 1 } else { s.files.get_mut(&saved_path()).unwrap().resize(size as usize, 0); 0 }
-    })
+#[unsafe(export_name="_ZN2nn2fs9WriteFileENS0_10FileHandleExPKvjRKNS0_11WriteOptionE")]
+extern "C" fn write(handle:u32,offset:i64,bytes:*const c_void,size:usize,flags:*const i32)->u32 {
+    assert_eq!((handle,offset),(0x22,0));assert_eq!(unsafe{*flags},1);
+    STORAGE.with(|s|{let mut s=s.borrow_mut();s.writes+=1;if s.write_error{1}else{let data=unsafe{std::slice::from_raw_parts(bytes.cast::<u8>(),size)};s.files.get_mut(&saved_path()).unwrap().copy_from_slice(data);0}})
 }
-#[unsafe(export_name = "_ZN2nn2fs9WriteFileENS0_10FileHandleExPKvjRKNS0_11WriteOptionE")]
-extern "C" fn write(handle: u32, offset: i64, bytes: *const c_void, size: usize, flags: *const i32) -> u32 {
-    assert_eq!(handle, 0x22); assert_eq!(offset, 0); assert_eq!(unsafe { *flags }, 1);
-    STORAGE.with(|s| {
-        let mut s = s.borrow_mut(); s.writes += 1;
-        if s.write_error { 1 } else {
-            let data = unsafe { std::slice::from_raw_parts(bytes.cast::<u8>(), size) };
-            s.files.get_mut(&saved_path()).unwrap().copy_from_slice(data); 0
-        }
-    })
+#[unsafe(export_name="_ZN2nn2fs9CloseFileENS0_10FileHandleE")]
+extern "C" fn close(handle:u32){assert!([0x11,0x22].contains(&handle));STORAGE.with(|s|{let mut s=s.borrow_mut();s.closes+=1;s.handles-=1;});}
+#[unsafe(export_name="igImFileOpen")]
+extern "C" fn im_open(path:*const c_char,open_mode:*const c_char)->*mut c_void {
+    let name=path_text(path);let access=path_text(open_mode);
+    if name=="app:/nativeNX/arc/player/quest/w14.arc" {
+        assert_eq!(access,"rb");PROBE_OPENS.fetch_add(1,std::sync::atomic::Ordering::Relaxed);
+        return if mode()=="probe-error"{std::ptr::null_mut()}else{probe_handle() as *mut c_void};
+    }
+    assert!(recompiled(),"native configs must use the save-data backend");assert_eq!(name,saved_path());assert!(["rb","wb"].contains(&access.as_str()));
+    STORAGE.with(|s|{let mut s=s.borrow_mut();assert_eq!(s.active_mounts,0);
+        if s.open_error||!s.indexed||(access=="rb"&&!s.files.contains_key(&name)){return std::ptr::null_mut();}
+        if access=="wb"{s.files.insert(name,Vec::new());}
+        s.handles+=1;(if access=="rb"{2usize}else{3usize}) as *mut c_void})
 }
-#[unsafe(export_name = "_ZN2nn2fs9CloseFileENS0_10FileHandleE")]
-extern "C" fn close(handle: u32) {
-    assert!([0x11,0x22].contains(&handle)); STORAGE.with(|s| {let mut s=s.borrow_mut();s.closes+=1;s.handles-=1;});
+#[unsafe(export_name="igImFileClose")]
+extern "C" fn im_close(file:*mut c_void)->bool {
+    if file as usize==probe_handle(){PROBE_CLOSES.fetch_add(1,std::sync::atomic::Ordering::Relaxed);return true;}
+    assert!(recompiled());assert!([2,3].contains(&(file as usize)));
+    STORAGE.with(|s|{let mut s=s.borrow_mut();s.closes+=1;s.handles-=1;!s.close_error})
+}
+#[unsafe(export_name="igImFileGetSize")]
+extern "C" fn im_size(file:*mut c_void)->u64 {
+    assert_eq!(file as usize,2);STORAGE.with(|s|{let s=s.borrow();if s.size_error||s.negative_size{u64::MAX}else{s.files[&saved_path()].len() as u64}})
+}
+#[unsafe(export_name="igImFileRead")]
+extern "C" fn im_read(bytes:*mut c_void,size:u64,count:u64,file:*mut c_void)->u64 {
+    assert_eq!(file as usize,2);assert_eq!(size,1);STORAGE.with(|s|{let mut s=s.borrow_mut();s.reads+=1;if s.read_error{0}else{unsafe{std::slice::from_raw_parts_mut(bytes.cast::<u8>(),count as usize)}.copy_from_slice(&s.files[&saved_path()]);count}})
+}
+#[unsafe(export_name="igImFileWrite")]
+extern "C" fn im_write(bytes:*const c_void,size:u64,count:u64,file:*mut c_void)->u64 {
+    assert_eq!(file as usize,3);assert_eq!(size,1);STORAGE.with(|s|{let mut s=s.borrow_mut();s.writes+=1;if s.write_error{0}else{let data=unsafe{std::slice::from_raw_parts(bytes.cast::<u8>(),count as usize)};s.files.insert(saved_path(),data.to_vec());count}})
+}
+
+fn check_backend_errors() {
+    assert!(LOCATION.save(&"x".repeat(8193)).is_err());
+    file_bytes(b"old");STORAGE.with(|s|s.borrow_mut().mount_error=true);
+    assert_eq!(LOCATION.save("new").is_ok(),recompiled());
+    file_bytes(b"old");STORAGE.with(|s|s.borrow_mut().commit_error=true);
+    assert_eq!(LOCATION.save("new").is_ok(),recompiled());
+    if recompiled() {
+        file_bytes(b"old");STORAGE.with(|s|s.borrow_mut().close_error=true);
+        let mut bytes=[0;8192];assert!(LOCATION.read(&mut bytes).is_err());assert!(LOCATION.save("new").is_err());
+    }
+    STORAGE.with(|s|assert_eq!((s.borrow().handles,s.borrow().active_mounts),(0,0)));
 }
 
 #[derive(Default)]
@@ -183,19 +219,20 @@ fn check_reader() {
     }
     file_bytes(b"[plugin]\nenabled=false");
     STORAGE.with(|s|s.borrow_mut().mount_error=true);
-    assert_eq!(LOCATION.load(default,config::Config::parse),default);
+    assert_eq!(LOCATION.load(default,config::Config::parse).enabled,!recompiled());
     let mut limit=b"[plugin]\nenabled=false\n".to_vec();limit.resize(8192,b' ');file_bytes(&limit);
     assert!(!LOCATION.load(default,config::Config::parse).enabled);
     STORAGE.with(|s| { *s.borrow_mut() = Storage::default(); });
 }
 fn check_storage() {
+    file_bytes(b"old contents");
     LOCATION.save_text("long old contents").unwrap(); LOCATION.save_text("new").unwrap();
     STORAGE.with(|s| {
         let s = s.borrow(); assert_eq!(s.files[&saved_path()], b"new"); assert_eq!((s.writes, s.closes), (2, 2));
     });
     for kind in 0..4 {
         file_bytes(b"existing");
-        STORAGE.with(|s| {let mut s=s.borrow_mut();s.size_error=kind==0;s.write_error=kind==1;s.open_error=kind>=2;s.create_error=kind==3;});
+        STORAGE.with(|s| {let mut s=s.borrow_mut();s.size_error=kind==0&&!recompiled();s.close_error=kind==0&&recompiled();s.write_error=kind==1;s.open_error=kind>=2;s.create_error=kind==3;});
         assert!(LOCATION.save_text("config").is_err());
         STORAGE.with(|s| assert_eq!(s.borrow().closes,usize::from(kind<2)));
     }
