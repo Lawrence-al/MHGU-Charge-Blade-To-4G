@@ -6,7 +6,7 @@ use crate::{Game, memory, resource::Resource};
 pub struct ProofEffectParams {
     reserved_00: u32,
     mask0: u32,
-    reserved_08: u32,
+    mask1: u32,
     misc: u32,
     position: [f32; 4],
     rotation: [f32; 4],
@@ -15,13 +15,17 @@ pub struct ProofEffectParams {
     bone: u16,
     reserved_44: [u8; 2],
     attach_mode: u8,
-    reserved_47: [u8; 0x11],
+    reserved_47: u8,
+    rotation_mode: u8,
+    reserved_49: [u8; 0x0F],
     unit_mask: u32,
     surface_mask: u32,
     reserved_60: [u8; 2],
     ground_snap: u8,
     auto_surface: u8,
-    reserved_64: [u8; 0x4C],
+    reserved_64: [u8; 0x34],
+    transform_flags: u32,
+    reserved_9c: [u8; 0x14],
     world_position: [f32; 4],
     parent_reference: u32,
     param_script: u32,
@@ -118,6 +122,13 @@ impl EffectCreateParams {
         self.proof.rotation = [rotation[0], rotation[1], rotation[2], 0.0];
     }
 
+    /// mask0 bit7覆盖PEL raw+38。0从父骨骼矩阵取旋转，2不继承父旋转。
+    /// 预览默认1会读取父对象的局部角，武器挂人物时不能代表最终世界朝向。
+    pub fn set_parent_rotation(&mut self, enabled: bool) {
+        self.proof.mask0 |= 1 << 7;
+        self.proof.rotation_mode = if enabled { 0 } else { 2 };
+    }
+
     /// 原生参数以 mask0 bit30 乘上 PEL 的基础尺度；新 PEL 基础尺度为 1。
     pub fn set_scale(&mut self, scale: [f32; 3]) {
         self.proof.mask0 |= 1 << 30;
@@ -144,6 +155,7 @@ const _: () = {
     assert!(offset_of!(EffectCreateParams, priority) == 0x08);
     assert!(offset_of!(EffectCreateParams, proof) == 0x10);
     assert!(offset_of!(ProofEffectParams, mask0) == 0x04);
+    assert!(offset_of!(ProofEffectParams, mask1) == 0x08);
     assert!(offset_of!(ProofEffectParams, misc) == 0x0C);
     assert!(offset_of!(ProofEffectParams, position) == 0x10);
     assert!(offset_of!(ProofEffectParams, unit_mask) == 0x58);
@@ -153,6 +165,8 @@ const _: () = {
     assert!(offset_of!(ProofEffectParams, world_position) == 0xB0);
     assert!(offset_of!(ProofEffectParams, bone) == 0x42);
     assert!(offset_of!(ProofEffectParams, attach_mode) == 0x46);
+    assert!(offset_of!(ProofEffectParams, rotation_mode) == 0x48);
+    assert!(offset_of!(ProofEffectParams, transform_flags) == 0x98);
     assert!(offset_of!(ProofEffectParams, parent_reference) == 0xC0);
     assert!(offset_of!(ProofEffectParams, param_script) == 0xC4);
 };

@@ -24,6 +24,7 @@ mod resource;
 mod runtime_hook;
 #[path = "../../shared/settings_menu.rs"]
 mod settings_menu;
+mod shield_thrust;
 mod sound;
 mod sound_bridge;
 mod state;

@@ -93,6 +93,12 @@ impl ChargeBladePlayer {
         unsafe { abi::frame_event(game.address(0x00280C1C), self.0, frame.to_bits()) != 0 }
     }
 
+    /// 011DFEB4普通分支使用的三轴朝向；低16位一周65536，特效参数使用度。
+    pub unsafe fn rotation(self) -> [f32; 3] {
+        [0xFE8, 0xFEC, 0xFF0].map(|offset|
+            unsafe { memory::read_u16(self.0 + offset) } as f32 * (360.0 / 65536.0))
+    }
+
     /// 复用011DEA04的原生空间基准，不调用其无瓶尘土创建。
     /// 611DFEB4给坡面/朝向角；原式为230*(cosX*sinY,-sinX,cosX*cosY)。
     pub unsafe fn saed_ground_pose(self, game: Game) -> ([f32; 3], [f32; 3]) {

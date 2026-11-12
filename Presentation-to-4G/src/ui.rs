@@ -29,21 +29,21 @@ fn draw_settings() {
                 imgui::checkbox(c"AED phial bursts (gaxe_006 / 009)", &mut c.four_g.aed_blast);
                 imgui::checkbox(c"SAED phial bursts (gaxe_107)", &mut c.four_g.saed_blast);
                 imgui::text("SAED phial bursts are off by default; GU phial bursts are used instead.");
-                imgui::text("Explosions use extracted second stages; the original lightning is not replaced.");
+                imgui::text("AED / SAED explosions use extracted second stages.");
                 imgui::text("AED hits use the contact point and cancel its ground explosion. Empty SAED has no 103.");
                 imgui::text("Phial attachment 002 disappears when the first phial burst begins.");
                 imgui::text("Converted resources are embedded in this plugin. Restart after saving.");
                 crate::preview::draw();
 
                 imgui::separator_text(c"GU lightning");
-                imgui::checkbox(c"Enable timed GU lightning", &mut c.effects);
-                imgui::checkbox(c"Red-shield thrust lightning", &mut c.shield_thrust);
+                imgui::checkbox(c"Enable timed shield effects", &mut c.effects);
+                imgui::checkbox(c"Red/blue-shield thrust effect / sound", &mut c.shield_thrust);
+                imgui::checkbox(c"Use 4G shield-thrust visual", &mut c.shield_thrust_4g);
                 frame_input(
                     c"Thrust lightning duration",
                     &mut c.shield_thrust_duration,
                     0.1,
                 );
-                imgui::text("GU resources, shield attachment and task durations are retained.");
                 task_group(
                     c"AED / SAED lightning tasks",
                     "action",

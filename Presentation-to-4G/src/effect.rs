@@ -15,6 +15,18 @@ use cb_game::{
     player::{ChargeBladePlayer, PhialKind},
 };
 
+/// 仅屏蔽盾突PSL的SEQUENCE火花；UNIQUE同号条目及其它动作继续原创建流程。
+pub unsafe fn should_block_sequence_effect(
+    player: ChargeBladePlayer, handle: u32, kind: u32, id: u32,
+) -> bool {
+    kind == 1
+        && id == 0x230
+        && crate::config_file::get().effects
+        && unsafe { player.is_instance(STATE.game()) }
+        && unsafe { player.sequence_pel().address() } == handle
+        && unsafe { player.animation_id() } == 0x1400
+}
+
 /// 每个节点独立累计剩余持续帧数。
 #[derive(Clone, Copy)]
 struct EffectLifetime {
@@ -212,11 +224,4 @@ pub unsafe fn create_on_shield(player: ChargeBladePlayer, effect_id: u16) -> Eff
     let node = unsafe { shell.create_unique(game, effect_id, &params) };
     unsafe { params.destruct(game) };
     node
-}
-
-/// 盾突起手初始化后有红盾就创建；不等待命中或瓶爆进程。
-pub unsafe fn on_shield_thrust_start(player: ChargeBladePlayer, duration_frames: f32) {
-    if unsafe { player.shield_state() } == 2 {
-        unsafe { create_timed_on_shield(player, 0x258, 0x259, duration_frames) };
-    }
 }

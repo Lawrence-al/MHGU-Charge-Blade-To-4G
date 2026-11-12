@@ -1,6 +1,9 @@
 //! SE 提交和 MSS 拦截规则；原生音序字段及播放池调用在 cb-game。
 use crate::{action, state::STATE};
-use cb_game::sound::{HitSoundSource, SeRequest, SoundSequence, submit_common_hit};
+use cb_game::{
+    player::ChargeBladePlayer,
+    sound::{HitSoundSource, MssEvent, SeRequest, SoundSequence, submit_common_hit},
+};
 
 /// 仅001808CC桥接的公共血声层进入这里；保留D8分支落点，安装时判断独立开关。
 /// 按直接来源的Shell002/003识别盾斧瓶爆，支持玩家动作结束后的迟发命中。
@@ -46,6 +49,17 @@ pub unsafe fn should_block_event(sequence: SoundSequence, command_bytes: *const 
         let is_player = unsafe { owner.is_charge_blade_player(STATE.game()) };
         if is_player {
             STATE.set_owner(owner);
+            if !command_bytes.is_null() {
+                let event = MssEvent::from_address(command_bytes as u32);
+                // 盾突本体0x1400的bank0请求0x44对应gaxe_imp。
+                if unsafe { event.opcode() } == 0x66
+                    && unsafe { event.bank() } == 0
+                    && unsafe { event.request_id() } == 0x44
+                    && unsafe { ChargeBladePlayer::from_address(owner.address()).animation_id() } == 0x1400
+                {
+                    return true;
+                }
+            }
         }
         if is_player && unsafe { action::find_block_rule(sequence, command_bytes) }.is_some() {
             return true;

@@ -44,6 +44,18 @@ fn main() {
     }
     println!("PASS: shared ARM32 effect layout/alignment and named setters match all old mask/parent/bone writes byte-for-byte");
     for enabled in [false, true] {
+        for fill in [0u8, 0xA5, 0xFF] {
+            let mut params = EffectCreateParams::zeroed();
+            let size = core::mem::size_of::<EffectCreateParams>();
+            unsafe { core::ptr::write_bytes(&mut params as *mut _ as *mut u8, fill, size) };
+            let mut expected = vec![fill; size];
+            let mask = u32::from_le_bytes(expected[0x14..0x18].try_into().unwrap()) | (1 << 7);
+            expected[0x14..0x18].copy_from_slice(&mask.to_le_bytes());
+            expected[0x58] = if enabled { 0 } else { 2 };
+            params.set_parent_rotation(enabled);
+            let bytes = unsafe { core::slice::from_raw_parts(&params as *const _ as *const u8, size) };
+            assert_eq!(bytes, expected);
+        }
         let mut params = EffectCreateParams::zeroed();
         params.set_ground_snap(enabled);
         let bytes = unsafe { core::slice::from_raw_parts(&params as *const _ as *const u8, 0xE0) };

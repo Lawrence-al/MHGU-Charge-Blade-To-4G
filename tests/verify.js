@@ -49,7 +49,7 @@ function verifyTables() {
     const activeSource = fs.readFileSync(path.join(root, project, 'src/hooks.rs'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
     const hooks = [...activeSource.matchAll(/cb_hook!\s*\{\s*(0x[0-9A-F]+)/g)].map(m => [Number(m[1]), 8]);
     if(project==='Presentation-to-4G'){
-      assert.deepEqual(hooks.map(([offset])=>offset),[0x011D3F04,0x00B67AE4,0x004D923C,0x004D74F8,0x011DABC8,0x011DE7E4,0x00282548,0x0048874C,0x004A1E50,0x011DA204,0x011DB280,0x00043224,0x0004201C]);
+      assert.deepEqual(hooks.map(([offset])=>offset),[0x011D415C,0x011D3F04,0x00B67AE4,0x004D923C,0x004D74F8,0x011DABC8,0x011DE7E4,0x00282548,0x0048874C,0x004A1E50,0x011DA204,0x011DB280,0x00043224,0x0004201C]);
     }else{assert.equal(hooks.length,5);}
     all.push(...hooks);
   }

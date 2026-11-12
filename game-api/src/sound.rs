@@ -1,5 +1,5 @@
 //! 音序、发声归属和 MSS 事件的对象接口。
-use crate::{Game, effect::WeaponEffectShell, memory, player::ChargeBladePlayer, shell::SaedShell};
+use crate::{Game, effect::WeaponEffectShell, memory, player::ChargeBladePlayer, resource::Resource, shell::SaedShell};
 
 /// 命中声使用的MhHitAtk；直接来源与最终归属玩家是两个字段。
 #[repr(transparent)]
@@ -37,6 +37,16 @@ pub unsafe fn submit_common_hit(
 pub unsafe fn play_common_at(game: Game, request: u16, position: u32, room: u32) -> u32 {
     let manager = unsafe { memory::read_u32(game.address(0x01896F5C)) };
     unsafe { submit_common_hit(game, manager, request as u32, position, room) }
+}
+
+/// PTS创建事件同用的显式SRQR提交入口；成功入队时复制坐标并为资源加引用。
+pub unsafe fn play_resource_at(game: Game, resource: Resource, request: u16, position: [f32; 3]) -> bool {
+    let manager = unsafe { memory::read_u32(game.address(0x01896F5C)) };
+    if manager == 0 { return false; }
+    let submit: unsafe extern "C" fn(u32, u32, u32, u32, *const f32) -> u32 =
+        unsafe { game.function(0x004F0668) };
+    unsafe { submit(manager, resource.address(), request as u32, 1, position.as_ptr()) };
+    true
 }
 
 #[repr(transparent)]

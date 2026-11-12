@@ -70,6 +70,7 @@ pub struct Config {
     pub four_g: FourGEffects,
     pub mute_aed_phial_blood: bool,
     pub phial_charge_cues: bool,
+    pub shield_thrust_4g: bool,
 }
 
 #[derive(Debug, PartialEq)]
@@ -93,6 +94,7 @@ impl Config {
         four_g: FourGEffects::DEFAULT,
         mute_aed_phial_blood: true,
         phial_charge_cues: true,
+        shield_thrust_4g: false,
     };
 
     pub fn parse(text: &str) -> Result<Self, ConfigError> {
@@ -155,6 +157,7 @@ impl Config {
                 ("4g_effects", "aed_blast") => config.four_g.aed_blast = boolean()?,
                 ("4g_effects", "saed_blast") => config.four_g.saed_blast = boolean()?,
                 ("effects", "shield_thrust") => config.shield_thrust = boolean()?,
+                ("effects", "shield_thrust_4g") => config.shield_thrust_4g = boolean()?,
                 ("effects", "shield_thrust_duration") => {
                     config.shield_thrust_duration = number(0.1, 10000.0)?
                 }
@@ -209,6 +212,7 @@ impl Config {
                     ("4g_effects", "aed_blast") => Bool(self.four_g.aed_blast),
                     ("4g_effects", "saed_blast") => Bool(self.four_g.saed_blast),
                     ("effects", "shield_thrust") => Bool(self.shield_thrust),
+                    ("effects", "shield_thrust_4g") => Bool(self.shield_thrust_4g),
                     ("effects", "shield_thrust_duration") => Float(self.shield_thrust_duration),
                     _ => {
                         let task = if let Some(i) =

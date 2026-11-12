@@ -134,7 +134,11 @@ unsafe fn on_aed_contact(shell: WeaponEffectShell, kind: u8, params: &EffectCrea
         } else { None }
     });
     if let Some(node) = ground { unsafe { node.stop_immediately(STATE.game()) }; }
-    let _ = unsafe { gaxe::create_visual(shell, 0x1005, if kind == 2 { 1 } else { 2 }, params) };
+    // 命中位置继续使用原shell/部位参数，方向取攻击者，避免继承shell固定的局部角。
+    let mut visual = unsafe { core::ptr::read(params) };
+    visual.set_rotation(unsafe { player.rotation() });
+    visual.set_parent_rotation(false);
+    let _ = unsafe { gaxe::create_visual(shell, 0x1005, if kind == 2 { 1 } else { 2 }, &visual) };
 }
 
 pub fn forget_node(node: u32) {

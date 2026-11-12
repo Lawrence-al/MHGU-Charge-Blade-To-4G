@@ -70,6 +70,14 @@ pub unsafe fn find_loaded_pel(game: Game, path: &core::ffi::CStr) -> Resource {
     Resource(unsafe { load(manager, game.address(0x01889FDC), path.as_ptr(), 0x80) })
 }
 
+/// 与PEL相同的缓存查询；ARC持有其SBKR和音源，返回引用由调用者持有。
+pub unsafe fn find_loaded_sound_request(game: Game, path: &core::ffi::CStr) -> Resource {
+    let manager = unsafe { memory::read_u32(game.address(0x02126A64)) };
+    let load: unsafe extern "C" fn(u32, u32, *const core::ffi::c_char, u32) -> u32 =
+        unsafe { memory::method(manager, 0x30) };
+    Resource(unsafe { load(manager, game.address(0x02125BEC), path.as_ptr(), 0x80) })
+}
+
 pub const SRQ_HEADER_SIZE: usize = 0x34;
 pub const SRQ_RECORD_SIZE: usize = 0x84;
 pub const PTS_ENTRY_SIZE: usize = 0x18;

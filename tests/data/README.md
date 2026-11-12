@@ -1,9 +1,9 @@
 # 第三下 HDP 基准
 
-`saed-hdp50.bin` 是 2026-10-03 实现新增 0x50 前，项目 asset 中地面超解第三下数据的完整 56 字节快照（持续 8、动作值 100）。
+2026-11-10已按用户要求把原分析说明移入Obsidian统一归档。
 
-测试使用这个固定快照作为数据依据，允许用户之后把 HDP 文件的 0x4F 改回原版，避免把正常的文件调整判作新增 0x50 出错。
+- [现行知识库总览](<D:/Work/obisidian-note/逆向/MHGU/docs/overview.md>)
+- [本专题](<D:/Work/obisidian-note/逆向/MHGU/docs/modules/saed.md>)
+- [原文 S0353](<D:/Work/obisidian-note/逆向/MHGU/backup/2026-11-10/projects/MHGU-Charge-Blade-to-4G/tests/data/README.md>)
 
-## 动作回归基准
-
-`presentation-reference.rs` 仅保留 2026-10-11 重构前执行器及其常量，用于比较新旧动作的发声与特效事件。它不参与 NRO 构建，替代已清理的整个历史副本目录。任务表摘要与 AED 命令的 24 字节基准分别在 `verify-presentation.js`、`verify-j-guard.js` 中固定保存。
+原文SHA256为 `0f7bc39875fd8a62c6f16034382a24b2e9185f08ccf2b5c8e78ec6fdba04e31f`，版本和验证范围以归档原文及现行专题说明为准。

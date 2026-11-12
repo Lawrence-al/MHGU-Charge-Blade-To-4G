@@ -43,9 +43,11 @@ class Arm {
     this.words = new Map(words);
     this.bytes = new Map(bytes);
     this.flags = { n: false, z: false, c: false, v: true };
+    this.floatFlags = { n: false, z: false, c: false, v: false };
     this.svcs = [];
     this.svcResult = 0;
     this.externalCalls = new Map();
+    this.exclusiveAddress = null;
   }
   read(addr, byte = false) {
     addr >>>= 0;
@@ -62,6 +64,14 @@ class Arm {
       const pc = this.r[15], ins = this.read(pc), cond = ins >>> 28;
       this.r[15] = (pc + 4) >>> 0;
       if (ins === 0xF57FF04F || ins === 0xF57FF06F || ins === 0xE320F000) continue;
+      if (ins === 0xF57FF01F) { this.exclusiveAddress = null; continue; }
+      if ((ins & 0xFFB00F50) >>> 0 === 0xFE300A00) {
+        const sd = ((ins >>> 12) & 15) * 2 + ((ins >>> 22) & 1);
+        const sn = ((ins >>> 16) & 15) * 2 + ((ins >>> 7) & 1);
+        const sm = (ins & 15) * 2 + ((ins >>> 5) & 1);
+        this.s[sd] = this.flags.n === this.flags.v && !this.flags.z ? this.s[sn] : this.s[sm];
+        continue;
+      }
       if (cond === 15) throw Error('不支持的无条件指令 0x' + ins.toString(16));
       const { n, z, c, v } = this.flags;
       const passed = [z, !z, c, !c, n, !n, v, !v, c && !z, !c || z,
@@ -91,7 +101,16 @@ class Arm {
       const sd = ((ins >>> 12) & 15) * 2 + ((ins >>> 22) & 1);
       const sn = ((ins >>> 16) & 15) * 2 + ((ins >>> 7) & 1);
       const sm = (ins & 15) * 2 + ((ins >>> 5) & 1);
-      if ((ins & 0x0FFF0FFF) === 0x010F0000) {
+      if ((ins & 0x0FF00FFF) === 0x01900F9F) {
+        // 单线程32位LDREX/STREX，用于生产STATE的计数和归属缓存原子访问。
+        this.exclusiveAddress = reg((ins >>> 16) & 15);
+        this.r[(ins >>> 12) & 15] = this.read(this.exclusiveAddress);
+      } else if ((ins & 0x0FF00FF0) === 0x01800F90) {
+        const address = reg((ins >>> 16) & 15), success = this.exclusiveAddress === address;
+        if (success) this.words.set(address, reg(ins & 15));
+        this.r[(ins >>> 12) & 15] = success ? 0 : 1;
+        this.exclusiveAddress = null;
+      } else if ((ins & 0x0FFF0FFF) === 0x010F0000) {
         // MRS APSR/CPSR：本解释器跟踪 NZCV，其它状态位不参与这些桥接。
         this.r[(ins >>> 12) & 15] = ((+this.flags.n << 31) | (+this.flags.z << 30) | (+this.flags.c << 29) | (+this.flags.v << 28)) >>> 0;
       } else if ((ins & 0x0FFFFFF0) === 0x0128F000) {
@@ -106,9 +125,9 @@ class Arm {
         const rt = (ins >>> 12) & 15;
         if (ins & (1 << 20)) this.r[rt] = this.s[sn];
         else this.s[sn] = reg(rt);
-      } else if ((ins & 0x0FFF0F00) === 0x0D2D0A00 || (ins & 0x0FFF0F00) === 0x0CBD0A00) {
+      } else if ((ins & 0x0FFF0E00) === 0x0D2D0A00 || (ins & 0x0FFF0E00) === 0x0CBD0A00) {
         const count = ins & 255;
-        if ((ins & 0x0FFF0F00) === 0x0D2D0A00) {
+        if ((ins & 0x0FFF0E00) === 0x0D2D0A00) {
           this.r[13] -= count * 4;
           for (let i = 0; i < count; i++) this.words.set((this.r[13] + i * 4) >>> 0, this.s[sd + i]);
         } else {
@@ -128,9 +147,26 @@ class Arm {
           else this.words.set(addr, this.s[sd + i]);
         }
         if (ins & (1 << 21)) this.r[rn] = start + count * 4;
+      } else if ((ins & 0x0FFFFFFF) === 0x0EF1FA10) {
+        this.flags = { ...this.floatFlags };
+      } else if ((ins & 0x0FBF0F50) === 0x0EB40A40 || (ins & 0x0FBF0F50) === 0x0EB50A40) {
+        const a = bitsFloat(this.s[sd]), b = ins & (1 << 16) ? 0 : bitsFloat(this.s[sm]);
+        this.floatFlags = Number.isNaN(a) || Number.isNaN(b)
+          ? { n: false, z: false, c: true, v: true }
+          : { n: a < b, z: a === b, c: a >= b, v: false };
       } else if ((ins & 0x0FB00FF0) === 0x0EB00A00) {
         const imm = (((ins >>> 16) & 15) << 4) | (ins & 15), b = (imm >>> 6) & 1;
         this.s[sd] = (((imm >>> 7) << 31) | ((1 - b) << 30) | (b ? 0x3E000000 : 0) | ((imm & 63) << 19)) >>> 0;
+      } else if ((ins & 0x0FBF0FD0) === 0x0EB00A40) {
+        this.s[sd] = this.s[sm];
+      } else if ((ins & 0x0FBF0FD0) === 0x0EB10A40) {
+        this.s[sd] = this.s[sm] ^ 0x80000000;
+      } else if ((ins & 0x0FBF0FD0) === 0x0EB10AC0) {
+        this.s[sd] = floatBits(Math.sqrt(bitsFloat(this.s[sm])));
+      } else if ((ins & 0x0FB00F50) === 0x0E800A00) {
+        this.s[sd] = floatBits(bitsFloat(this.s[sn]) / bitsFloat(this.s[sm]));
+      } else if ((ins & 0x0FB00F50) === 0x0E300A40) {
+        this.s[sd] = floatBits(bitsFloat(this.s[sn]) - bitsFloat(this.s[sm]));
       } else if ((ins & 0x0FB00F50) === 0x0E200A00 || (ins & 0x0FB00F50) === 0x0E300A00) {
         const a = bitsFloat(this.s[sn]), b = bitsFloat(this.s[sm]);
         this.s[sd] = floatBits((ins & 0x0FB00F50) === 0x0E200A00 ? a * b : a + b);
@@ -176,11 +212,21 @@ class Arm {
         if (ins & (1 << 20)) {
           const value = this.read(addr, true) | (kind === 2 ? 0 : this.read(addr + 1, true) << 8);
           this.r[rd] = kind === 1 ? value : kind === 2 ? (value << 24) >> 24 : (value << 16) >> 16;
+        } else if (kind === 2) {
+          this.r[rd] = this.read(addr); this.r[rd + 1] = this.read(addr + 4);
+        } else if (kind === 3) {
+          this.words.set(addr, reg(rd)); this.words.set(addr + 4, reg(rd + 1));
         } else {
           assert.equal(kind, 1, '只支持 STRH');
           this.bytes.set(addr, reg(rd) & 255); this.bytes.set(addr + 1, (reg(rd) >>> 8) & 255);
         }
         if (!pre || ins & (1 << 21)) this.r[rn] = adjusted;
+      } else if ((ins & 0x0FE0007F) === 0x07C0001F) {
+        const rd = (ins >>> 12) & 15, low = (ins >>> 7) & 31, high = (ins >>> 16) & 31;
+        this.r[rd] &= ~((0xFFFFFFFF >>> (31 - high + low)) << low);
+      } else if ((ins & 0x0FFF03F0) === 0x06FF0070) {
+        const rd = (ins >>> 12) & 15, amount = ((ins >>> 10) & 3) * 8;
+        this.r[rd] = rotate(reg(ins & 15), amount) & 0xFFFF;
       } else if (((ins >>> 26) & 3) === 1) {
         const rn = (ins >>> 16) & 15, rd = (ins >>> 12) & 15;
         const offset = ins & (1 << 25) ? shifted().value : ins & 0xFFF;
@@ -206,6 +252,12 @@ class Arm {
           if (op === 8 || ins & (1 << 20)) this.flags = {
             n: !!(result >>> 31), z: result === 0, c: operand.carry, v: this.flags.v,
           };
+        } else if (op === 1 || op === 9) {
+          const result = (a ^ value) >>> 0;
+          if (op === 1) this.r[rd] = result;
+          if (op === 9 || ins & (1 << 20)) this.flags = {
+            n: !!(result >>> 31), z: result === 0, c: operand.carry, v: this.flags.v,
+          };
         } else if (op === 4 || op === 11) {
           const sum = a + value, result = sum >>> 0;
           if (op === 11 || ins & (1 << 20)) this.flags = {
@@ -213,8 +265,19 @@ class Arm {
             v: !!((~(a ^ value) & (a ^ result)) >>> 31),
           };
           if (op === 4) this.r[rd] = result;
+        } else if (op === 14) {
+          const result = (a & ~value) >>> 0;
+          this.r[rd] = result;
+          if (ins & (1 << 20)) this.flags = {
+            n: !!(result >>> 31), z: result === 0, c: operand.carry, v: this.flags.v,
+          };
         } else if (op === 12) this.r[rd] = a | value;
-        else if (op === 13) this.r[rd] = value;
+        else if (op === 13) {
+          this.r[rd] = value;
+          if (ins & (1 << 20)) this.flags = {
+            n: !!(value >>> 31), z: value === 0, c: operand.carry, v: this.flags.v,
+          };
+        }
         else if (op === 15) this.r[rd] = ~value;
         else throw Error('不支持的 ALU 指令 0x' + ins.toString(16));
       } else throw Error('不支持的指令 0x' + ins.toString(16));

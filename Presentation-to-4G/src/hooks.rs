@@ -3,12 +3,21 @@
 
 // use forge::log::prelude::error;
 
-use crate::{action, action_bridges, effect, phial, preview, resource};
+use crate::{action, action_bridges, effect, phial, preview, resource, shield_thrust};
 use cb_game::{effect::EffectNode, player::ChargeBladePlayer, sound::SoundSequence};
 
 // ============================================================================
 // 当前启用的钩子
 // ============================================================================
+
+// 盾斧进任务的shell/武器资源初始化完成后，按配置预载4G盾突PEL和声音ARC。
+crate::cb_hook! { 0x011D415C,
+fn hook_cb_quest_init(player_actor: u32) -> u32, |original| {
+    let result = unsafe { original(player_actor) };
+    shield_thrust::preload();
+    result
+}
+}
 
 // 盾斧通用Move：站立时也处理预览请求，菜单渲染线程不调用游戏创建器。
 crate::cb_hook! { 0x011D3F04,
@@ -77,12 +86,16 @@ fn hook_saed_create(player_actor: u32, aerial: u32) -> u32, |original| {
 }
 }
 
-// 原PSL尘土请求完成后，再按该次请求的位置建立005；原节点/PTS及其slot绑定保持。
+// 盾突原火花在创建前屏蔽；其余原PSL请求完成后，再处理005地爆。
 crate::cb_hook! { 0x00282548,
 fn hook_player_sequence_effect(player_actor: u32, handle: u32, kind: u32, id: u32,
     params: &mut cb_game::effect::EffectCreateParams, pts: u32) -> u32, |original| {
+    let player = ChargeBladePlayer::from_address(player_actor);
+    if unsafe { effect::should_block_sequence_effect(player, handle, kind, id) } {
+        return 0;
+    }
     let result = unsafe { original(player_actor, handle, kind, id, params, pts) };
-    unsafe { phial::on_sequence_created(ChargeBladePlayer::from_address(player_actor), handle, kind, id, params, result) };
+    unsafe { phial::on_sequence_created(player, handle, kind, id, params, result) };
     result
 }
 }
@@ -122,15 +135,14 @@ fn hook_cb_burst_action(player_actor: u32, variant: u32) -> u32, |original| {
 }
 }
 
-// 盾突起手有红盾就创建原GU闪电，不等待命中。
+// 盾突起手初始化后提交所选特效和4G声音，不等待命中。
 crate::cb_hook! { 0x011DB280,
 fn hook_cb_shield_thrust_action(player_actor: u32, variant: u32) -> u32, |original| {
     let player = ChargeBladePlayer::from_address(player_actor);
     let starting = unsafe { player.action_state() } == 0;
     let result = unsafe { original(player_actor, variant) };
     if starting {
-        let config = crate::config_file::get();
-        unsafe { effect::on_shield_thrust_start(player, config.shield_thrust_duration) };
+        unsafe { shield_thrust::on_start(player) };
     }
     result
 }
@@ -228,10 +240,11 @@ pub fn enable(game_base: u32) {
     if config.sounds || config.effects {
         forge::install_hook!(game_base, hook_cb_burst_action);
     }
-    if config.effects {
-        if config.shield_thrust { forge::install_hook!(game_base, hook_cb_shield_thrust_action); }
+    if config.shield_thrust && (config.effects || config.sounds) {
+        forge::install_hook!(game_base, hook_cb_quest_init);
+        forge::install_hook!(game_base, hook_cb_shield_thrust_action);
     }
-    if config.four_g.aed_explosion { forge::install_hook!(game_base, hook_player_sequence_effect); }
+    if config.effects || config.four_g.aed_explosion { forge::install_hook!(game_base, hook_player_sequence_effect); }
     if config.four_g.phial_attachment || config.sounds { forge::install_hook!(game_base, hook_phial_damage); }
     if config.four_g.saed_blast { forge::install_hook!(game_base, hook_defined_effect); }
     phial::enable(game_base);

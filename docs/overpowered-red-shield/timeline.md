@@ -1,9 +1,9 @@
 # Timeline
 
-- 2026-10-18：核对现行四处整链替换和 0x7DC 弹刀过滤。
-- 2026-10-18：解析六份原始 ARC，并与既有提取字节核对相同；确认红盾 057a 和各风格后摇命令。
-- 2026-10-18：核对 InitMoveChain、命令查询和 Hit_func，提出原链副本合并方案；未修改或部署游戏代码。
-- 2026-10-18：用户明确授权后，备份源码和已安装 NRO；确认表头 DTI 大小 0x1C、数量 +8、数组 +20、输入状态容量 48。
-- 2026-10-18：移除四处整链替换和全局弹刀查询屏蔽，加入原 InitMoveChain 完成后的每玩家表合并，保留当前资源的条件与窗口。
-- 2026-10-18：72 组原资源合并／重载、336 组编译后 ARM 回调、512 组钩子选择及完整 test.sh 通过；宿主瓶爆测试补充新 command 模块导入。
-- 2026-10-18：备份并只更新游戏目录的 cb_moveset_to_4g.nro；安装器核对其它 9 份文件未变，不写用户 INI。未启动游戏验证。
+2026-11-10已按用户要求把原分析说明移入Obsidian统一归档。
+
+- [现行知识库总览](<D:/Work/obisidian-note/逆向/MHGU/docs/overview.md>)
+- [本专题](<D:/Work/obisidian-note/逆向/MHGU/docs/modules/moveset.md>)
+- [原文 S0345](<D:/Work/obisidian-note/逆向/MHGU/backup/2026-11-10/projects/MHGU-Charge-Blade-to-4G/docs/overpowered-red-shield/timeline.md>)
+
+原文SHA256为 `6d32d1ed89d079c6bc09b3f3889f8d9fae41fcb0fb46ca6055052456994cbed6`，版本和验证范围以归档原文及现行专题说明为准。

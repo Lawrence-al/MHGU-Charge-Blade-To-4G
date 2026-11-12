@@ -26,11 +26,20 @@ fn main() {
     let mut custom = config::Config::DEFAULT; custom.enabled=false;
     ${presentation ? `
     assert_eq!(core::mem::offset_of!(config::Config, shield_thrust_duration),12);
+    assert_eq!(core::mem::offset_of!(config::Config, shield_thrust_4g),228);
     custom.sounds=false; custom.patch_srq=false; custom.patch_pts=false; custom.volume_4a=-3.9;
     assert!(config::Config::DEFAULT.mute_aed_phial_blood);
     custom.mute_aed_phial_blood=false;
     assert!(config::Config::DEFAULT.phial_charge_cues);custom.phial_charge_cues=false;
     custom.effects=false; custom.shield_thrust=false; custom.shield_thrust_duration=19.5;
+    assert!(!config::Config::DEFAULT.shield_thrust_4g);
+    assert!(!config::Config::parse("[effects]\\nshield_thrust=true").unwrap().shield_thrust_4g);
+    custom.shield_thrust_4g=true;
+    for value in [false,true] {
+        let c=config::Config::parse(&format!("[effects]\\nshield_thrust_4g={value}")).unwrap();
+        assert_eq!(c.shield_thrust_4g,value);check_roundtrip(c);
+    }
+    assert!(config::Config::parse("[effects]\\nshield_thrust_4g=1").is_err());
     assert_eq!(config::Config::DEFAULT.four_g,config::FourGEffects{
         aed_explosion:true,saed_explosion:true,phial_attachment:true,ed_blast:true,aed_blast:true,saed_blast:false});
     for bits in 0..64 {
@@ -84,6 +93,7 @@ fn main() {
         let s=s.borrow();let at=|label:&str|s.drawn.iter().position(|v|v==label).unwrap();
         assert!(at("4G explosions and phial effects")<at("GU lightning"));
         assert!(at("GU lightning")<at("Sound"));
+        assert!(at("Use 4G shield-thrust visual")<at("Sound"));
         assert!(at("Sound")<at("Mute phial blood sound"));
         for(prefix,tasks)in [("action",tasks::ACTION_TASKS),("burst",tasks::BURST_ACTION_TASKS)]{
             for(i,task)in tasks.iter().enumerate(){
@@ -120,6 +130,7 @@ fn main() {
         s.bools.insert("burst.0/Enable task".into(),false);
         s.bools.insert("Mute phial blood sound".into(),false);
         s.bools.insert("Yellow / red phial charge sound (PTS)".into(),false);
+        s.bools.insert("Use 4G shield-thrust visual".into(),true);
         for label in ["AED hit / ground explosion (gaxe_005 tail)","SAED ground explosion with phials (gaxe_103 tail)",
             "Phial attachment (gaxe_002)","ED I / II phial bursts (gaxe_003 / 008)",
             "AED phial bursts (gaxe_006 / 009)","SAED phial bursts (gaxe_107)"] {
@@ -152,6 +163,7 @@ fn main() {
     assert_eq!(saved.volume_4a,-3.9);assert_eq!(saved.shield_thrust_duration,21.0);
     assert!(!saved.mute_aed_phial_blood);
     assert!(!saved.phial_charge_cues);
+    assert!(saved.shield_thrust_4g);
     assert_eq!(saved.action[0].frame,6.0);assert_eq!(saved.action[0].duration_frames,17.0);assert!(!saved.burst[0].enabled);
     assert_eq!(saved.four_g,custom.four_g);
     ` : `
