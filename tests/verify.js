@@ -43,7 +43,7 @@ function verifyTables() {
   // 旧24处改值仅作为兼容签名；真实写入为9个标准内部Hook，不再改literal pool。
   const numeric=fs.readFileSync(path.join(root,'Moveset-to-4G/src/instruction_hooks.rs'),'utf8');
   const numericSites=[...numeric.matchAll(/push\(\s*branches,\s*(0x[0-9A-F]+)/g)].map(m=>Number(m[1]));
-  assert.deepEqual(numericSites,[0x011DF8B0,0x011DF8D0,0x0048859C,0x011DADD4,0x011DBDA0,0x011DADA0,0x011DBD54,0x0048906C,0x011DE838]);
+  assert.deepEqual(numericSites,[0x011DF8B0,0x011DF8D0,0x0048859C,0x011DADD4,0x011DBDA0,0x011DADA0,0x011DBD50,0x0048906C,0x011DE838]);
   all.push(...numericSites.map(site=>[site,8]));
   for (const project of ['Presentation-to-4G', 'Moveset-to-4G']) {
     const activeSource = fs.readFileSync(path.join(root, project, 'src/hooks.rs'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');

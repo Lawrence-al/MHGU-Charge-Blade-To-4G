@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "scope": "MH4G shield thrust, isolated wave/bank/request",
+  "request_id": 85,
+  "cue_id": 0,
+  "key": 85,
+  "volume_boost_db": 6.0,
+  "sources": [
+    {
+      "file": "sound\\se\\pl\\wp\\gaxe\\com\\wave\\gaxe_shield_atk.mca",
+      "bytes": 10592,
+      "sha256": "61571ba504448aa052a9d8e298396b60ad1743354296a0f631870823d992752b"
+    },
+    {
+      "file": "sound\\se\\pl\\wp\\gaxe\\com\\snd_wp_gaxe_com.sbk",
+      "bytes": 1736,
+      "sha256": "55836a41ebbdf3d210f33ad021a932ca6db0069646df3c8469d0b53ec82a3b8e"
+    },
+    {
+      "file": "sound\\se\\pl\\wp\\gaxe\\com\\snd_wp_gaxe_com.srq",
+      "bytes": 2943,
+      "sha256": "383f3125506170e27a3641b4f4a96f3b819d44d12ff175b2830d356b005a556c"
+    }
+  ],
+  "entries": [
+    {
+      "path": "sound\\cb4g\\shield_thrust",
+      "type_hash": "0x79C47B59",
+      "bytes": 10616,
+      "sha256": "c7fa07dff7a2716faa917813c6b36a012232715205ebcd747832fd224a92186b"
+    },
+    {
+      "path": "sound\\cb4g\\shield_thrust",
+      "type_hash": "0x15D782FB",
+      "bytes": 145,
+      "sha256": "9b47fa8ca0d06ac0e71ad91453a440fbc48eb37ff1318e3132dd0e760322e331"
+    },
+    {
+      "path": "sound\\cb4g\\shield_thrust",
+      "type_hash": "0x1BCC4966",
+      "bytes": 224,
+      "sha256": "8a37398d6e8a5ee84156647a7423202348459292ec892e108360b667ec9b9afc"
+    }
+  ],
+  "archive": {
+    "file": "cb_shield_thrust_4g.arc",
+    "bytes": 43201,
+    "sha256": "6b7efd695cbaeebaa699844a00695ffaf9ff300427c9b1ef7b15a55893dc1a23"
+  }
+}

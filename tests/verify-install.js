@@ -114,7 +114,7 @@ fn all_feature_combinations() {
         let p=unsafe { patches::selected(BASE,&c) };
         let expected:Vec<_>=groups.iter().enumerate().filter(|(i,_)| on(*i)).flat_map(|(_,g)| g.iter().copied()).collect();
         assert_eq!(p.words.iter().map(|&(o,_,v)| (o,v)).collect::<Vec<_>>(),expected,"mask={mask}");
-        let branches:Vec<_>=[(true,0x011D5C64),(true,0x0054924C),(true,0x00549784),(on(11),0x011D6914),(on(11),0x011DAD48),(on(3),0x011DDE74),(on(4)||on(8)||on(10),0x002EA87C),(on(9),0x011DFB0C),(on(9),0x002F0800),(on(1),0x011DF8B0),(on(1),0x011DF8D0),(on(2),0x0048859C),(on(5),0x011DADD4),(on(5),0x011DBDA0),(on(5),0x011DADA0),(on(5),0x011DBD54),(on(5),0x0048906C),(on(5),0x011DE838)].into_iter().filter(|&(enabled,_)| enabled).map(|(_,o)|o).collect();
+        let branches:Vec<_>=[(true,0x011D5C64),(true,0x0054924C),(true,0x00549784),(on(11),0x011D6914),(on(11),0x011DAD48),(on(3),0x011DDE74),(on(4)||on(8)||on(10),0x002EA87C),(on(9),0x011DFB0C),(on(9),0x002F0800),(on(1),0x011DF8B0),(on(1),0x011DF8D0),(on(2),0x0048859C),(on(5),0x011DADD4),(on(5),0x011DBDA0),(on(5),0x011DADA0),(on(5),0x011DBD50),(on(5),0x0048906C),(on(5),0x011DE838)].into_iter().filter(|&(enabled,_)| enabled).map(|(_,o)|o).collect();
         assert_eq!(p.branches.iter().map(|b|b.offset).collect::<Vec<_>>(),branches);
         assert!(c.needs_hitdata()); assert_eq!(c.needs_phial(),on(5));
         c.enabled=false;
